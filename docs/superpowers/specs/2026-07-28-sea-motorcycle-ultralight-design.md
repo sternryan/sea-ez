@@ -48,7 +48,9 @@ anyway).
 
 - Design pilot + gear: **190 lb** → gross ≈ **470–500 lb**
 - Wing area: **135–150 sq ft** (24 kt stall at ~490 lb with high-lift ultralight
-  airfoil; donor planform expected to land in range — Kolb Firefly ≈ 130 sq ft)
+  airfoil; note the Kolb Firefly is 117 sq ft per published specs — our wing
+  scales UP from the donor planform; the 24 kt stall math governs, see
+  docs/research/2026-07-donor-selection.md)
 - Power: **28–35 hp gas pusher** (Vittorazi Moster 185 / Polini Thor class),
   premix 2-stroke, magneto ignition, pull start
 - Cruise target: 45–55 kt (deliberately draggy is acceptable; 103 caps speed)
