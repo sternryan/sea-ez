@@ -46,3 +46,15 @@ def planform(area_sqft: float, span_ft: float, taper_ratio: float, center_x_ft: 
         mac_ft=mac,
         mac_le_x_ft=center_x_ft - mac / 2.0,
     )
+
+
+def horizontal_tail_volume(stab_area_sqft: float, tail_arm_ft: float,
+                           wing_area_sqft: float, mac_ft: float) -> float:
+    """V_h = S_h * l_h / (S * MAC). Arm is tail AC to gross CG, bow datum."""
+    return stab_area_sqft * tail_arm_ft / (wing_area_sqft * mac_ft)
+
+
+def vertical_tail_volume(fin_area_sqft: float, tail_arm_ft: float,
+                         wing_area_sqft: float, span_ft: float) -> float:
+    """V_v = S_v * l_v / (S * b). Arm is tail AC to gross CG, bow datum."""
+    return fin_area_sqft * tail_arm_ft / (wing_area_sqft * span_ft)

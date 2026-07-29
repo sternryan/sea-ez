@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from seaez.ledger import load_parts, rollup_empty_lb, chute_lb
+from seaez.ledger import load_parts, rollup_empty_lb, chute_lb, cg
 from seaez.params import DEFAULT
-from seaez.sizing import stall_speed_kt, wing_area_for_stall, planform
+from seaez.sizing import stall_speed_kt, wing_area_for_stall, planform, horizontal_tail_volume, vertical_tail_volume
 
 PARTS = Path(__file__).parent.parent / "data" / "parts.yaml"
 
@@ -49,3 +49,39 @@ def test_planform_geometry():
 def test_planform_untapered_mac_equals_chord():
     pf = planform(140.0, 34.0, 1.0, 7.9)
     assert pf.mac_ft == pytest.approx(140.0 / 34.0, abs=1e-9)
+
+
+def tail_arm_ft() -> float:
+    """Tail AC to actual gross CG (bow datum)."""
+    parts = load_parts(PARTS)
+    _t, cg_x, _z = cg(parts, extra_masses=[
+        (DEFAULT.pilot_lb, DEFAULT.seat_x_ft, DEFAULT.seat_z_flight_ft),
+        (DEFAULT.fuel_lb, DEFAULT.fuel_x_ft, DEFAULT.fuel_z_ft),
+    ])
+    return DEFAULT.tail_ac_x_ft - cg_x
+
+
+def test_tail_volume_formulas_known_point():
+    # S_h=21, l=10.26, S=140, MAC=4.1794 -> V_h ~ 0.368
+    assert horizontal_tail_volume(21.0, 10.2597, 140.0, 4.1794) == pytest.approx(0.3682, abs=0.001)
+    # S_v=6, l=10.26, S=140, b=34 -> V_v ~ 0.0129
+    assert vertical_tail_volume(6.0, 10.2597, 140.0, 34.0) == pytest.approx(0.01293, abs=0.0003)
+
+
+def test_gate_horizontal_tail_volume():
+    """GATE: V_h >= 0.35 (low end of light-aircraft practice; ultralights run
+    low, but the high-pylon thrust couple argues against going lower)."""
+    vh = horizontal_tail_volume(
+        DEFAULT.stab_area_sqft, tail_arm_ft(), DEFAULT.wing_area_sqft,
+        planform(DEFAULT.wing_area_sqft, DEFAULT.wing_span_ft,
+                 DEFAULT.wing_taper_ratio, DEFAULT.wing_center_x_ft).mac_ft,
+    )
+    assert vh >= 0.35, f"V_h = {vh:.3f}"
+
+
+def test_gate_vertical_tail_volume():
+    """GATE: V_v >= 0.012 (ultralight-typical low end)."""
+    vv = vertical_tail_volume(
+        DEFAULT.fin_area_sqft, tail_arm_ft(), DEFAULT.wing_area_sqft, DEFAULT.wing_span_ft,
+    )
+    assert vv >= 0.012, f"V_v = {vv:.4f}"
