@@ -49,9 +49,29 @@ class DesignParams:
     folded_wing_z_ft: float = 2.2         # wings folded alongside boom: CG height estimate
     keel_to_ground_ft: float = 0.5        # wheels-down keel-to-pavement clearance estimate; tipover uses CG height above GROUND
 
+    # --- Empennage (SIZED by the Phase 2.2 tail-volume gates; massing_v0's
+    # 7.0x1.4 stab computed V_h~0.17 — too small, superseded by these) ---
+    stab_span_ft: float = 8.4
+    stab_chord_ft: float = 2.5
+    fin_area_sqft: float = 6.0
+    tail_ac_x_ft: float = 17.4            # tail aerodynamic-center station (bow datum), massing_v0 boom
+
+    # --- Propulsion geometry (spec §3-4; thrust is a TARGET until measured) ---
+    static_thrust_lb: float = 165.0       # Moster 185 class ~75 kgf static; conservative max for couple
+    thrust_line_z_ft: float = 4.35        # prop center above keel baseline, massing_v0
+
+    # --- Fold geometry (spec §4 Kolb-style aft-fold; pivot at rear spar root) ---
+    fold_pivot_x_ft: float = 9.4          # rear-spar attach station estimate (bow datum)
+    fold_root_y_ft: float = 0.7           # panel root offset from centerline
+    fold_clearance_ft: float = 0.5        # per-side stowage clearance in folded width
+
     @property
     def fuel_lb(self) -> float:
         return self.fuel_capacity_gal * self.fuel_density_lb_per_gal
+
+    @property
+    def stab_area_sqft(self) -> float:
+        return self.stab_span_ft * self.stab_chord_ft
 
 
 DEFAULT = DesignParams()
