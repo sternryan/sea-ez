@@ -1,5 +1,27 @@
 # Delta Launch-Site Survey — Sacramento–San Joaquin Delta
 
+## Sectional verification — 2026-07-28 (CLOSES the Travis AFB flag)
+
+Ryan supplied current SF sectional excerpts covering the Delta (reviewed in session
+2026-07-28), plus computed great-circle distances from the KSUU published coordinates
+(AirNav: 38.2645 N, 121.9241 W):
+
+- **KSUU → Rio Vista waterfront: 12.8 nm; → Sandy Beach ramp: 13.7 nm; → Bethel Island:
+  19.3 nm.** No Class D surface area appears on the chart anywhere near the Rio Vista
+  reach or the central Delta; the Travis D ring sits around the base itself, north of
+  Suisun Bay. The only Travis-related chart feature over the Montezuma hills is an
+  advisory radar-limitations caution box, not airspace.
+- **Delta surface airspace confirmed Class G under a 700 AGL Class E floor** (magenta
+  vignette covers the Bethel Island/Frank's Tract, Rio Vista, and Isleton areas) —
+  Part 103 legal at the surface with no authorization.
+- **SFO Mode C/ADS-B 30 nm veil** boundary runs near Byron/Brentwood, west of the launch
+  sites; Bethel Island computes ~44 nm from SFO — outside the veil.
+
+The survey's Travis AFB items below are retained for history but are now RESOLVED by the
+above; the airspace caveats in the Rio Vista and Bethel Island sections no longer gate a
+site decision.
+
+
 **Date:** 2026-07-28
 **Consumes:** [spec §1 (mission)](../superpowers/specs/2026-07-28-sea-motorcycle-ultralight-design.md#1-mission), [spec §9 open questions](../superpowers/specs/2026-07-28-sea-motorcycle-ultralight-design.md#11-open-questions-research-gate-inputs-not-blockers-to-planning) — "Delta launch-site shortlist (ramp grade, slough width, prevailing wind)."
 **Scope:** Candidate areas per the Research Gate brief — Bethel Island, Discovery Bay, Rio Vista, Isleton, Walnut Grove. Ranked evaluation against five criteria: public ramp within ~1.5 mi of plausible housing, slough width ≥1,500 ft straight run (or open reach), prevailing wind alignment, boat traffic density, Class G/E ceiling above.
