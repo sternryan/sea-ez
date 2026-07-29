@@ -15,6 +15,7 @@ def test_printed_primary_structure_is_rejected():
         name="printed_spar", group="wing", mass_lb=5.0,
         classification="primary_structure", process="fdm_print",
         counts_toward_empty=True, is_chute=False,
+        x_ft=7.9, z_ft=3.35,
     )
     out = violations([bad])
     assert len(out) == 1
