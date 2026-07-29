@@ -25,3 +25,29 @@
 **Root Cause:** Datum written during brainstorming from model memory, unverified.
 **Solution:** The donor-research memo's "every number carries a URL or unverified tag" rule surfaced the conflict; spec corrected (commit 727d978) same session.
 **Key Insight:** Research-memo tasks with a hard citation rule double as spec linters — the discrepancy was found because the memo was FORBIDDEN from restating spec numbers as facts.
+
+### Mixed z-datums silently made two physics gates anti-conservative
+<!-- problem_type: bug -->
+<!-- component: seaez/hydro.py, seaez/roadmode.py -->
+<!-- root_cause: three coexisting vertical datums (keel-baseline params frame, mesh z frame with keel at ~0.2 ft, ground plane below keel) mixed inside gate formulas -->
+<!-- resolution_type: fix -->
+<!-- severity: high -->
+<!-- date: 2026-07-29 -->
+
+**Problem:** Sponson-touch heel and road-tipover gates passed with wrong numbers (4.3° vs 5.0°, 0.72 g vs 0.58 g) — both errors in the anti-conservative direction on a life-safety project.
+**Root Cause:** `wing_z_ft` (keel datum) subtracted a mesh-datum waterline; tipover treated CG-above-keel as CG-above-ground. Per-task reviews all approved; only the adversarial whole-branch review caught it by recomputing in a consistent frame.
+**Solution:** Renamed args to carry the datum (`waterline_above_keel_ft`), added `keel_to_ground_ft` param, converted at call sites via `wl - mesh.bounds[0][2]`.
+**Key Insight:** In geometry-backed gate code, put the datum IN the parameter name and convert at the boundary — and note that plausible-looking margins hide datum bugs, so the final reviewer must re-derive at least one number per gate in a single consistent frame.
+
+### Well-spec'd plans make cheap-model SDD nearly frictionless
+<!-- problem_type: workflow -->
+<!-- component: SDD loop / plan authoring -->
+<!-- root_cause: plan contained complete code + expected numeric outcomes per task, so implementers were transcribers and reviewers were verifiers -->
+<!-- resolution_type: design_change -->
+<!-- severity: medium -->
+<!-- date: 2026-07-29 -->
+
+**Problem:** 10-task phase risked burning session budget on frontier-model implementers.
+**Root Cause:** N/A — this is a positive pattern capture.
+**Solution:** Fable wrote the plan with exact code, exact YAML tables, and hand-calculated expected values (479 lb, 31.8% MAC, ~0.72 ratio); haiku transcribed pure-code tasks, sonnet handled multi-file/CAD tasks; every implementer's computed numbers matched the plan's predictions, so drift was instantly visible.
+**Key Insight:** Hand-computing expected gate values INTO the plan turns every subagent report into a self-checking oracle — mismatch = bug, match = cheap confidence. Worth the planning time on any physics/numeric pipeline.
