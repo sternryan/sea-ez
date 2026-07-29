@@ -42,6 +42,13 @@ def _current_fingerprint() -> dict:
         "stab_area_sqft": p.stab_area_sqft, "fin_area_sqft": p.fin_area_sqft,
         "tail_ac_x_ft": p.tail_ac_x_ft,
         "cg_x_ft": round(cg_x, 4), "cg_z_ft": round(cg_z, 4),
+        "wing_center_x_ft": p.wing_center_x_ft, "wing_z_ft": p.wing_z_ft,
+        "stab_span_ft": p.stab_span_ft, "stab_chord_ft": p.stab_chord_ft,
+        "hull_length_ft": p.hull_length_ft, "hull_beam_ft": p.hull_beam_ft,
+        "hull_depth_ft": p.hull_depth_ft,
+        # must match aero/fingerprint.py's params_fingerprint() identically
+        # (aero/vsp_model.py places stab & fin XForm Z at hull_depth_ft + 0.5).
+        "tail_z_ft": p.hull_depth_ft + 0.5,
     }
 
 

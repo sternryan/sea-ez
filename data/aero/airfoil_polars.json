@@ -10,7 +10,15 @@
   "fin_area_sqft": 6.0,
   "tail_ac_x_ft": 17.4,
   "cg_x_ft": 7.1403,
-  "cg_z_ft": 2.1089
+  "cg_z_ft": 2.1089,
+  "wing_center_x_ft": 7.9,
+  "wing_z_ft": 3.35,
+  "stab_span_ft": 8.4,
+  "stab_chord_ft": 2.5,
+  "hull_length_ft": 12.0,
+  "hull_beam_ft": 2.5,
+  "hull_depth_ft": 1.35,
+  "tail_z_ft": 1.85
  },
  "reynolds_mac": 1063124,
  "ncrit": 9,
