@@ -34,9 +34,8 @@ def folded_envelope(p: DesignParams) -> FoldedEnvelope:
     stowed_depth = 0.12 * pf.root_chord_ft + p.fold_clearance_ft
     width = p.hull_beam_ft + 2.0 * stowed_depth
 
-    airframe_length = 18.5  # massing_v0 OVERALL_LENGTH_FT — airframe incl. tail
     return FoldedEnvelope(
         width_ft=width,
-        length_ft=max(tip_x, airframe_length),
+        length_ft=max(tip_x, p.overall_length_ft),
         tip_x_ft=tip_x,
     )

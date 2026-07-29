@@ -5,6 +5,11 @@ airworthiness proof (spec safety notice). The constants below are classic
 first-pass assumptions for a strut-braced high-wing with an aft tail; they
 are TARGETS, replaced by OpenVSP analysis in Phase 2.3. All stability gates
 are for the NO-FOREPLANE configuration (v1 first flights, spec §4).
+
+V_v is the least trustworthy analytic gate here: the model ignores the
+destabilizing forward hull side area (large on a flying boat) and reuses
+the stab AC station as the fin arm — highest priority for OpenVSP
+replacement in 2.3.
 """
 from __future__ import annotations
 

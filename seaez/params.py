@@ -54,7 +54,8 @@ class DesignParams:
     stab_span_ft: float = 8.4
     stab_chord_ft: float = 2.5
     fin_area_sqft: float = 6.0
-    tail_ac_x_ft: float = 17.4            # tail aerodynamic-center station (bow datum), massing_v0 boom
+    tail_ac_x_ft: float = 17.4            # stab quarter-chord AC station (bow datum); massing_v0's 17.4 was the OLD 1.4-chord stab's geometric center — same number, now an honest AC via the boom extension (see overall_length_ft)
+    overall_length_ft: float = 19.4       # airframe length incl. tail: boom EXTENDED from massing_v0's 18.5 so the 2.5 ft-chord stab's quarter-chord AC sits at tail_ac_x_ft (TE at 19.275 + tailcone). Boom mass delta lands in the 2.3 laminate accounting.
 
     # --- Propulsion geometry (spec §3-4; thrust is a TARGET until measured) ---
     static_thrust_lb: float = 165.0       # Moster 185 class ~75 kgf static; conservative max for couple
@@ -63,7 +64,7 @@ class DesignParams:
     # --- Fold geometry (spec §4 Kolb-style aft-fold; pivot at rear spar root) ---
     fold_pivot_x_ft: float = 9.4          # rear-spar attach station estimate (bow datum)
     fold_root_y_ft: float = 0.7           # panel root offset from centerline
-    fold_clearance_ft: float = 0.5        # per-side stowage clearance in folded width
+    fold_clearance_ft: float = 0.5        # per-side stowage clearance in folded width — MUST also cover the tucked wingtip sponson; 2.3 fold kinematics verifies (width gate margin is only 0.30 ft total)
 
     @property
     def fuel_lb(self) -> float:

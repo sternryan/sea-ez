@@ -21,3 +21,12 @@ def test_folded_length_reconciliation_report():
     env = folded_envelope(DEFAULT)
     assert env.length_ft == pytest.approx(25.7, abs=0.3)
     assert env.length_ft > 19.0  # documents that the spec §4 estimate is NOT met
+
+
+def test_stab_te_inside_overall_length():
+    """The resized stab (AC at tail_ac_x_ft, quarter-chord convention) must
+    fit inside the declared airframe length — guards the stale-station class
+    of bug found in the Phase 2.2 final review."""
+    p = DEFAULT
+    stab_te_x = p.tail_ac_x_ft - 0.25 * p.stab_chord_ft + p.stab_chord_ft
+    assert stab_te_x <= p.overall_length_ft
