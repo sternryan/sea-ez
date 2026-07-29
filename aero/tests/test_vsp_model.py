@@ -39,3 +39,21 @@ def test_returns_all_component_ids():
     ids = build_model()
     assert set(ids.keys()) == {"wing_id", "stab_id", "fin_id", "hull_id"}
     assert all(isinstance(v, str) and v for v in ids.values())
+
+
+def test_hull_bbox_matches_beam_depth():
+    # Regression: a POD geom is a body of revolution (single radius) and
+    # cannot represent beam != depth -- it silently builds 2x too wide with
+    # its belly below the keel. Measure the BUILT geometry (not just the
+    # parms) so a future regression to POD-like behavior is caught.
+    ids = build_model()
+    p = DEFAULT
+    bmin = vsp.GetGeomBBoxMin(ids["hull_id"], 0, True)
+    bmax = vsp.GetGeomBBoxMax(ids["hull_id"], 0, True)
+    length = bmax.x() - bmin.x()
+    beam = bmax.y() - bmin.y()
+    assert length == pytest.approx(p.hull_length_ft, abs=0.05)
+    assert beam == pytest.approx(p.hull_beam_ft, abs=0.05)
+    # Z-extent: keel baseline (0) to spine (hull_depth_ft), nothing below Z=0.
+    assert bmin.z() >= -0.05
+    assert bmax.z() == pytest.approx(p.hull_depth_ft, abs=0.05)

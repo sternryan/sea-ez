@@ -55,9 +55,23 @@ def build_model(save_path: Path | None = None) -> dict:
          X_Rel_Rotation=90.0)  # rotate planar surface vertical
     vsp.SetParmValUpdate(fin, "Sym_Planar_Flag", "Sym", 0)  # single surface, no mirror
 
-    hull = vsp.AddGeom("POD")
+    # POD is a body of revolution (single radius) and cannot represent a
+    # beam (2.5 ft) != depth (1.35 ft) cross-section -- FineRatio only sets
+    # length/radius, so a POD built to spec silently comes out 2x too wide
+    # and z-centered below the keel baseline. Use FUSELAGE instead: its
+    # middle cross-sections take independent width/height, and the built
+    # geometry (not just the parm) is verified against the bow/keel frame
+    # by test_hull_bbox_matches_beam_depth below.
+    hull = vsp.AddGeom("FUSELAGE")
     vsp.SetGeomName(hull, "hull")
-    _set(hull, "Design", Length=p.hull_length_ft, FineRatio=p.hull_length_ft / p.hull_beam_ft)
+    vsp.SetParmValUpdate(hull, "Length", "Design", p.hull_length_ft)
+    hull_xsec_surf = vsp.GetXSecSurf(hull, 0)
+    # Default fuselage has 5 XSecs: pointed nose (0), three full-beam middle
+    # sections (1-3), pointed tail (4). Set the middle sections to the hull's
+    # true beam/depth; leave the end caps pointed (representative side area,
+    # not hull fidelity).
+    for i in range(1, vsp.GetNumXSec(hull_xsec_surf) - 1):
+        vsp.SetXSecWidthHeight(vsp.GetXSec(hull_xsec_surf, i), p.hull_beam_ft, p.hull_depth_ft)
     _set(hull, "XForm", X_Rel_Location=0.0, Z_Rel_Location=p.hull_depth_ft / 2.0)
 
     vsp.Update()
