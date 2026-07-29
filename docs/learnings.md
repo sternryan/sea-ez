@@ -64,3 +64,11 @@
 **Root Cause:** Resizing one parameter (stab area) without re-deriving the stations that depended on the old geometry. Per-task reviewers verified formulas against the brief; only the whole-branch adversarial pass re-derived the station from the massing source.
 **Solution:** Boom extension (overall 18.5→19.4 ft) makes 17.4 an honest quarter-chord AC; new consistency test pins stab TE ≤ overall length; hardcoded duplicate of overall length removed from foldmode.
 **Key Insight:** When a design parameter changes, grep for every station/constant derived from the OLD value — and add a geometric-consistency test (part fits inside declared envelope) so the class of bug can't recur silently. Final reviews should re-derive stations from primary geometry, not just check formulas.
+
+## Phase 2.3a (2026-07-29) — computed-aero grounding
+
+- **Parm round-trip ≠ built geometry.** OpenVSP POD FineRatio is Length/RADIUS (built hull 2x wide, crossed the keel datum) and the brief's Sweep=0 wing violated the chords-centered convention (AC at 14.5% MAC, −10 pts of phantom instability). Both slipped past parm-echo checks; both were caught only by measuring the BUILT surface (absolute-frame bbox, CompPnt01 probes). Guard class: every CAD-model test must measure built geometry in the absolute frame.
+- **Guards can fail open.** The staleness fingerprint's `float(fp.get(k, nan)) - cur > tol` was always False for MISSING keys — a fail-closed guard silently inverted. NaN never survives a comparison; never use get()-with-NaN-default in a validator.
+- **Convention seams between analytic SSOT and CAD are the recurring bug class** (2.1 datum mixing, 2.2 stale station, 2.3a chords-centered). The wing-alone VLM anchor (untapered wing must show NP≈25% MAC) is the cheap canary that caught it this time — keep pipeline anchors in every solver integration.
+- **Fixed-width Fortran buffers truncate long paths silently** (XFOIL PACC and LOAD) — short relative names + cwd, always.
+- Honest outcome: usa35b selected (2D 1.694 → 3D 1.5246), stall 25.75 kt > 24 ceiling; VSPAERO SM +5.46% < 8% target (α-dependent, ≈+2.2% at α=−2°); CNβ +0.0412 green. Both shortfalls surfaced to Ryan in docs/research/2026-07-29-airfoil-clmax-finding.md rather than gate-fudged.
