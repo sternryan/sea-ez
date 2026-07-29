@@ -4,7 +4,7 @@ import pytest
 
 from seaez.ledger import load_parts, rollup_empty_lb, chute_lb
 from seaez.params import DEFAULT
-from seaez.sizing import stall_speed_kt, wing_area_for_stall
+from seaez.sizing import stall_speed_kt, wing_area_for_stall, planform
 
 PARTS = Path(__file__).parent.parent / "data" / "parts.yaml"
 
@@ -35,3 +35,17 @@ def test_gate_stall_at_design_gross_within_limit():
     """GATE: still legal at the top of the design gross band."""
     vs = stall_speed_kt(DEFAULT.gross_design_lb, DEFAULT.wing_area_sqft, DEFAULT.cl_max)
     assert vs <= DEFAULT.stall_limit_kt
+
+
+def test_planform_geometry():
+    # S=140, b=34, taper 0.65, unswept with chords centered at x=7.9
+    pf = planform(140.0, 34.0, 0.65, 7.9)
+    assert pf.root_chord_ft == pytest.approx(4.991, abs=0.01)   # 2S / (b(1+t))
+    assert pf.tip_chord_ft == pytest.approx(3.244, abs=0.01)
+    assert pf.mac_ft == pytest.approx(4.179, abs=0.01)          # (2/3)Cr(1+t+t^2)/(1+t)
+    assert pf.mac_le_x_ft == pytest.approx(7.9 - 4.179 / 2.0, abs=0.01)
+
+
+def test_planform_untapered_mac_equals_chord():
+    pf = planform(140.0, 34.0, 1.0, 7.9)
+    assert pf.mac_ft == pytest.approx(140.0 / 34.0, abs=1e-9)
