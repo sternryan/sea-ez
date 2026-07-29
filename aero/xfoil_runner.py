@@ -6,6 +6,7 @@ decrement is applied downstream in seaez/aerodata.py.
 """
 from __future__ import annotations
 
+import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -55,10 +56,21 @@ def run_polar(airfoil: str | Path, reynolds: float, alpha_start: float,
               alpha_end: float, alpha_step: float, workdir: Path) -> list[PolarPoint]:
     polar = workdir / "polar.txt"
     polar.unlink(missing_ok=True)
+    if isinstance(airfoil, Path):
+        # XFOIL's LOAD command hits the same fixed-width Fortran filename
+        # buffer as PACC: a long absolute path (e.g. pytest's tmp_path)
+        # silently fails to load and XFOIL falls back to its main menu with
+        # no error. Copy the coordinate file into workdir under a short name
+        # and load that instead — subprocess cwd is already set to workdir.
+        local_dat = workdir / "foil.dat"
+        shutil.copy(airfoil, local_dat)
+        cmd_airfoil: str | Path = Path(local_dat.name)
+    else:
+        cmd_airfoil = airfoil
     # XFOIL's PACC filename buffer is fixed-width and silently truncates long
     # absolute paths (observed with pytest's tmp_path). Pass a bare relative
     # name instead — subprocess cwd is already set to workdir below.
-    cmds = _commands(airfoil, reynolds, alpha_start, alpha_end, alpha_step, Path(polar.name))
+    cmds = _commands(cmd_airfoil, reynolds, alpha_start, alpha_end, alpha_step, Path(polar.name))
     subprocess.run([str(XFOIL_BIN)], input=cmds, capture_output=True,
                    text=True, cwd=workdir, timeout=120)
     if not polar.exists():
