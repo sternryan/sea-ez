@@ -4,8 +4,11 @@ import pytest
 
 from seaez.ledger import cg, load_parts
 from seaez.params import DEFAULT
-from seaez.sizing import horizontal_tail_volume, planform
-from seaez.stability import neutral_point_frac, static_margin_frac
+from seaez.sizing import horizontal_tail_volume, planform, stall_speed_kt
+from seaez.stability import (
+    neutral_point_frac, static_margin_frac, tail_authority_moment_lbft,
+    thrust_couple_ratio, thrust_pitch_moment_lbft,
+)
 
 PARTS = Path(__file__).parent.parent / "data" / "parts.yaml"
 
@@ -48,3 +51,26 @@ def test_gate_static_margin_no_foreplane():
     cg_frac = (cg_x - pf().mac_le_x_ft) / pf().mac_ft
     sm = static_margin_frac(cg_frac, vh_actual())
     assert sm >= 0.08, f"static margin {sm:.1%} MAC"
+
+
+def test_thrust_moment_formula():
+    # 165 lb thrust, 2.24 ft above CG -> 369.6 lb-ft nose-down
+    assert thrust_pitch_moment_lbft(165.0, 4.35, 2.11) == pytest.approx(369.6, abs=0.5)
+
+
+def test_gate_tail_counters_thrust_couple_at_rotation():
+    """GATE: tail pitch authority >= 1.2x the full-static-thrust nose-down
+    couple at rotation speed (1.2 Vs). This is THE configuration risk of the
+    high-pylon pusher (spec §4: foreplane exists for exactly this reason, but
+    v1 flies without it — so the tail alone must clear the gate)."""
+    total, cg_x, cg_z = gross_cg()
+    vs = stall_speed_kt(total, DEFAULT.wing_area_sqft, DEFAULT.cl_max)
+    ratio = thrust_couple_ratio(
+        thrust_lb=DEFAULT.static_thrust_lb,
+        thrust_line_z_ft=DEFAULT.thrust_line_z_ft,
+        cg_z_ft=cg_z,
+        speed_kt=1.2 * vs,
+        stab_area_sqft=DEFAULT.stab_area_sqft,
+        tail_arm_ft=DEFAULT.tail_ac_x_ft - cg_x,
+    )
+    assert ratio >= 1.2, f"tail authority / thrust couple = {ratio:.2f}"
