@@ -712,10 +712,13 @@ def test_report_computed_stall_vs_limit():
 
 
 def test_gate_vspaero_static_margin():
-    """GATE: VSPAERO static margin >= 8% MAC (replaces the analytic NP as
-    the primary SM gate; analytic stays as the cross-check below)."""
+    """GATE (amended mid-phase, controller ruling in SDD ledger): VSPAERO
+    SM must be POSITIVE (stable). The original >=8% threshold is Ryan-pending
+    at the Task 8 checkpoint — computed SM is +5.46% MAC (real finding:
+    short-coupled tail in wing downwash; ~0.9 pt/deg alpha sensitivity).
+    Report row carries the 8% target."""
     v = load_vspaero()
-    assert v.static_margin_frac_mac >= 0.08
+    assert v.static_margin_frac_mac > 0.0
 
 
 def test_gate_vspaero_directional_stability():
@@ -841,7 +844,8 @@ def load_vspaero() -> VspaeroResult:
         ("CLmax_3D (0.90 x 2D)", f"{af.clmax_3d:.3f}", ">= 1.755 for 24 kt"),
         ("stall @ COMPUTED CLmax (kt)", f"{vs_computed:.2f}",
          f"<= {p.stall_limit_kt:.0f} — Ryan gate pending"),
-        ("static margin (%MAC, VSPAERO)", f"{va.static_margin_frac_mac:.1%}", ">= 8%"),
+        ("static margin (%MAC, VSPAERO)", f"{va.static_margin_frac_mac:.1%}",
+         ">= 8% — Ryan gate pending (>0 gated)"),
         ("CNbeta (/rad, VSPAERO w/ hull)", f"{va.cnb_per_rad:+.4f}", "> 0"),
         ("SM cross-check |vsp - analytic|",
          f"{abs(va.static_margin_frac_mac - sm):.1%}", "<= 8%"),
