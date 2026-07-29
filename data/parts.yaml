@@ -1,0 +1,19 @@
+# Mass budget ledger — SSOT: spec §5. Every future part signs this contract.
+# classification: primary_structure | secondary | non_structural
+# process: composite_layup | machined_metal | fdm_print | purchased
+parts:
+  - {name: wing_assembly,          group: wing,      mass_lb: 62.0, classification: primary_structure, process: composite_layup, counts_toward_empty: true,  is_chute: false}
+  - {name: hull_chassis,           group: hull,      mass_lb: 55.0, classification: primary_structure, process: composite_layup, counts_toward_empty: true,  is_chute: false}
+  - {name: tail_boom_empennage,    group: tail,      mass_lb: 16.0, classification: primary_structure, process: composite_layup, counts_toward_empty: true,  is_chute: false}
+  - {name: foreplane_module,       group: foreplane, mass_lb: 4.0,  classification: primary_structure, process: composite_layup, counts_toward_empty: true,  is_chute: false}
+  - {name: engine_mount_exhaust,   group: propulsion, mass_lb: 34.0, classification: primary_structure, process: purchased,      counts_toward_empty: true,  is_chute: false}
+  - {name: prop,                   group: propulsion, mass_lb: 8.0,  classification: primary_structure, process: purchased,      counts_toward_empty: true,  is_chute: false}
+  - {name: prop_guard_ring,        group: propulsion, mass_lb: 4.0,  classification: secondary,         process: fdm_print,      counts_toward_empty: true,  is_chute: false}
+  - {name: fuel_system_dry,        group: fuel,      mass_lb: 4.0,  classification: secondary,          process: purchased,      counts_toward_empty: true,  is_chute: false}
+  - {name: landing_gear,           group: gear,      mass_lb: 22.0, classification: primary_structure,  process: machined_metal, counts_toward_empty: true,  is_chute: false}
+  - {name: pedal_drivetrain,       group: gear,      mass_lb: 9.0,  classification: secondary,          process: purchased,      counts_toward_empty: true,  is_chute: false}
+  - {name: controls,               group: controls,  mass_lb: 8.0,  classification: primary_structure,  process: machined_metal, counts_toward_empty: true,  is_chute: false}
+  - {name: instruments_sensors,    group: avionics,  mass_lb: 1.5,  classification: non_structural,     process: purchased,      counts_toward_empty: true,  is_chute: false}
+  - {name: accessory_battery_pack, group: avionics,  mass_lb: 1.5,  classification: non_structural,     process: purchased,      counts_toward_empty: true,  is_chute: false}
+  - {name: hardware_paint_misc,    group: misc,      mass_lb: 8.0,  classification: non_structural,     process: purchased,      counts_toward_empty: true,  is_chute: false}
+  - {name: ballistic_parachute,    group: safety,    mass_lb: 22.0, classification: non_structural,     process: purchased,      counts_toward_empty: true,  is_chute: true}
