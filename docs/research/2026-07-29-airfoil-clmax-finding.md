@@ -33,7 +33,14 @@ SHORT (1.75 kt over, CLmax_3D short by 0.230).
    S=140 (1.79 > 1.755) without needing the area increase. Changes spar/rib
    work scoped in 2.3b, and Part-103 stall must be met in the LANDING config,
    so flaps COUNT toward the 24 kt gate — this is a legitimate lever, not a
-   loophole.
+   loophole. **Caveat on the low end of that range:** the +0.3 increment only
+   clears the bar at S=140 (1.694+0.3=1.994 → ×0.90 = **1.794 vs 1.755
+   required, a 2.2% margin**), and that arithmetic assumes (a) the plain-flap
+   Δclmax applies FULL-SPAN — i.e. flaperons, not partial-span flaps, since a
+   partial-span installation delivers materially less 3D increment — and (b)
+   the optimistic 0.90 edge of the 0.85–0.90 3D-decrement band for this
+   AR-8.26 straight-tapered wing. At the +0.5 end or the 0.85 factor the
+   margin is much healthier; at the +0.3/0.90 corner it is thin.
 3. **Higher-lift section outside the ruled candidates** (slotted, thick
    high-camber) — new XFOIL sweep, same harness, cheap to run.
 4. **Gross down / span up** — touches the locked 2.1/2.2 envelope; least
@@ -46,11 +53,19 @@ SHORT (1.75 kt over, CLmax_3D short by 0.230).
 **Computed (OpenVSP 3.51.2 / VSPAERO, 2026-07-29, `data/aero/vspaero_stability.json`):**
 
 - SM (full model, hull included) = **+5.46% MAC** vs 8% target (analytic
-  cross-check said 11.5% MAC — see provenance note below).
+  cross-check said 11.5% MAC — see provenance note below). **This is the
+  α=+2° rotation-condition number, not a floor** — see the α=−2° figure
+  under root cause (a) below before treating 5.46% as the number Decision 2
+  is accepting.
 - Neutral point = 37.28% MAC.
-- CNβ = **+0.0412 /rad** with hull modeled — comfortably positive. The old
-  V_v-only blind spot (isolated-tail sideforce, no hull sideforce term) is
-  closed; this gate is green and needs no further lever.
+- CNβ = **+0.0412 /rad** with hull modeled — comfortably positive. Hull side
+  area is now modeled (VLM-grade thin-plate representation, not a validated
+  slender-body treatment) — Munk-class slender-body estimates suggest the
+  hull's true destabilization could run up to ~1.6x what the thin-plate VLM
+  shows; even substituting that worse-case hull number, CNβ stays
+  ≈ +0.035/rad — comfortably positive. The gate is robust to that
+  uncertainty, but "blind spot closed" should be read as VLM-grade, not as
+  validated engineering.
 
 **Root causes (now understood, not guessed):**
 
@@ -65,7 +80,16 @@ SHORT (1.75 kt over, CLmax_3D short by 0.230).
   `alpha_sweep_sm_frac_mac_no_hull_post_fix` block in
   `data/aero/vspaero_stability.json`). SM stiffens as alpha rises toward
   stall, which is the direction that matters for handling — but this is a
-  VLM-grade statement, not a validated-engineering one.
+  VLM-grade statement, not a validated-engineering one. **Stated plainly for
+  Decision 2:** the +5.46% headline is the α=+2° condition only. Applying the
+  hull's measured ~2.5-point cost to the committed α=−2° no-hull figure
+  (4.67%) puts the full-model SM at the low-speed/low-CL end of the
+  committed sweep at **≈ +2.2% MAC** — the number "accepting 5.5%" is really
+  accepting at those states, not 5.5% everywhere. Also note the "rotation-
+  speed condition" label is loose: at 1.2·Vs the trim CL is ≈1.25, which
+  implies a trim alpha well above 2° — so α=2° is not actually trim at that
+  speed (a mismatch that happens to run in the conservative direction, since
+  higher alpha means higher SM per the sweep above).
 - **(b) Hull destabilization.** The hull costs a further −2.5 MAC points
   on top of the no-hull case (7.97% no-hull → 5.46% full-model), consistent
   with the pre-wing-fix isolation delta — the hull's own contribution is
@@ -89,6 +113,35 @@ SM shortfall is a real aero effect (downwash + hull), not a pipeline artifact.
    downwash problem directly) and may also help 2.3b fold kinematics, but
    the interaction with fold geometry needs to be checked in that phase, not
    assumed here.
+
+   **Disclosure:** the model's current stab/fin Z placement (`hull_depth_ft
+   + 0.5 = 1.85 ft`) is a **massing-inherited placeholder, not a designed
+   tail height** — flagged for this review per the SDD ledger's Task 5 note.
+   A stab-Z sensitivity sweep (in-memory VSPAERO parm edits over the
+   committed model, full-model, α=2°, same Sref/bref/cref/Xcg/Zcg/Vinf as
+   the committed run; not a committed geometry change) gives:
+
+   | stab/fin Z (ft) | SM (%MAC) | CNβ (/rad) | note |
+   |---|---|---|---|
+   | 1.85 | 5.46 | +0.0412 | baseline (current model, massing placeholder) |
+   | 2.60 | 5.23 | +0.0369 | |
+   | 3.35 | 9.78 | +0.0268 | coincides exactly with `wing_z_ft` (3.35 ft) |
+   | 4.00 | 5.06 | +0.0384 | |
+
+   **Interpretation:** this does NOT show a clean "raise the tail, buy SM"
+   trend — the result is non-monotonic and the one high point (9.78% at
+   3.35 ft) lands exactly at wing height, where the stab sits coplanar with
+   the wing in the thin-surface VLM mesh; that is a plausible solver
+   degeneracy (coincident/near-coincident thin sheets), not evidence of a
+   real aerodynamic benefit at that specific height. Read honestly: over the
+   1.85–4.0 ft band tested, SM stays in a noisy 5.0–5.5% MAC range with one
+   likely-artifactual outlier — this sweep **does not support** treating a
+   T-tail as a strong SM lever without testing heights that clearly clear
+   the wing wake (well above 4.0 ft) and re-checking the 3.35 ft point for a
+   meshing artifact before drawing any conclusion from it. The
+   wake-proximity mechanism in root cause (a) remains real; this sweep
+   mainly shows the four tested heights don't cleanly demonstrate it.
+
 4. **Accept 5.5% with the alpha-trend documented** — the SM grows toward
    stall (the safe direction), and the shortfall is modest. This is the
    "do nothing new" option, carried with the alpha-sweep evidence attached
