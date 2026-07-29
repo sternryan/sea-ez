@@ -41,6 +41,23 @@ def test_returns_all_component_ids():
     assert all(isinstance(v, str) and v for v in ids.values())
 
 
+def test_wing_tip_chord_centered_on_wing_center_x():
+    # Regression: sizing.planform() centers EVERY chord (root and tip) on
+    # wing_center_x_ft (see its docstring); a zero-sweep LE instead aligns
+    # the LEs, sweeping the quarter-chord line forward outboard and moving
+    # the VLM wing AC to ~14.5% MAC instead of ~25%. Measure the BUILT tip
+    # LE surface point (not a parm) so a future regression back to
+    # zero-sweep is caught even if some parm still reads "correct".
+    ids = build_model()
+    p = DEFAULT
+    pf = planform(p.wing_area_sqft, p.wing_span_ft, p.wing_taper_ratio, p.wing_center_x_ft)
+    # u=1.0 is the wingtip station; w=0.5 is the leading edge (min-x) locus
+    # of the WING surface parameterization (verified live: w=0/1 are the
+    # trailing edge, w=0.5 is the LE).
+    tip_le = vsp.CompPnt01(ids["wing_id"], 0, 1.0, 0.5)
+    assert tip_le.x() == pytest.approx(p.wing_center_x_ft - pf.tip_chord_ft / 2.0, abs=0.02)
+
+
 def test_hull_bbox_matches_beam_depth():
     # Regression: a POD geom is a body of revolution (single radius) and
     # cannot represent beam != depth -- it silently builds 2x too wide with

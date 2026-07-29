@@ -8,6 +8,7 @@ engineering and NOT airworthiness proof.
 """
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import openvsp as vsp
@@ -26,12 +27,25 @@ def build_model(save_path: Path | None = None) -> dict:
     pf = planform(p.wing_area_sqft, p.wing_span_ft, p.wing_taper_ratio, p.wing_center_x_ft)
     vsp.ClearVSPModel()
 
+    # sizing.planform() centers EVERY chord (root and tip) on wing_center_x_ft
+    # (see its docstring; the 31.8% MAC CG gate depends on this frame). With
+    # a tapered wing that means the tip LE sits aft of the root LE by half
+    # the chord difference -- a zero-sweep LE would instead align the LEs
+    # and sweep the quarter-chord line forward outboard, moving the VLM
+    # wing AC to ~14.5% MAC instead of ~25%. Derive the LE sweep from params
+    # so the built wing matches the chords-centered convention exactly.
+    wing_le_sweep_deg = math.degrees(math.atan(
+        ((pf.root_chord_ft - pf.tip_chord_ft) / 2.0) / (p.wing_span_ft / 2.0)))
+
     wing = vsp.AddGeom("WING")
     vsp.SetGeomName(wing, "wing")
     _set(wing, "XSec_1", Span=p.wing_span_ft / 2.0,
-         Root_Chord=pf.root_chord_ft, Tip_Chord=pf.tip_chord_ft, Sweep=0.0)
-    # Zero sweep is at the LE by default; chords centered on wing_center_x_ft
-    # means the root LE sits half a root chord forward of it.
+         Root_Chord=pf.root_chord_ft, Tip_Chord=pf.tip_chord_ft,
+         Sweep=wing_le_sweep_deg)
+    # Sweep_Location defaults to 0.0 (LE-referenced, verified live) so Sweep
+    # above is applied at the leading edge, not the quarter-chord.
+    # Root LE sits half a root chord forward of wing_center_x_ft; the LE
+    # sweep above carries the tip LE aft to center_x - tip_chord/2 to match.
     _set(wing, "XForm",
          X_Rel_Location=p.wing_center_x_ft - pf.root_chord_ft / 2.0,
          Z_Rel_Location=p.wing_z_ft)
