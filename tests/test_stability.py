@@ -1,0 +1,50 @@
+from pathlib import Path
+
+import pytest
+
+from seaez.ledger import cg, load_parts
+from seaez.params import DEFAULT
+from seaez.sizing import horizontal_tail_volume, planform
+from seaez.stability import neutral_point_frac, static_margin_frac
+
+PARTS = Path(__file__).parent.parent / "data" / "parts.yaml"
+
+
+def gross_cg():
+    parts = load_parts(PARTS)
+    return cg(parts, extra_masses=[
+        (DEFAULT.pilot_lb, DEFAULT.seat_x_ft, DEFAULT.seat_z_flight_ft),
+        (DEFAULT.fuel_lb, DEFAULT.fuel_x_ft, DEFAULT.fuel_z_ft),
+    ])
+
+
+def pf():
+    return planform(DEFAULT.wing_area_sqft, DEFAULT.wing_span_ft,
+                    DEFAULT.wing_taper_ratio, DEFAULT.wing_center_x_ft)
+
+
+def vh_actual() -> float:
+    _t, cg_x, _z = gross_cg()
+    return horizontal_tail_volume(
+        DEFAULT.stab_area_sqft, DEFAULT.tail_ac_x_ft - cg_x,
+        DEFAULT.wing_area_sqft, pf().mac_ft,
+    )
+
+
+def test_neutral_point_known_value():
+    # NP = 0.25 + 0.9*0.85*(1-0.35)*V_h ; V_h=0.3682 -> 0.25+0.1831 = 0.4331
+    assert neutral_point_frac(0.3682) == pytest.approx(0.4331, abs=0.002)
+
+
+def test_static_margin_is_np_minus_cg():
+    assert static_margin_frac(0.30, 0.3682) == pytest.approx(0.4331 - 0.30, abs=0.002)
+
+
+def test_gate_static_margin_no_foreplane():
+    """GATE: analytic static margin >= 8% MAC, no foreplane (v1 first-flight
+    config, spec §4). Assumption constants documented in seaez/stability.py;
+    OpenVSP replaces this estimate in Phase 2.3 (spec §8)."""
+    _t, cg_x, _z = gross_cg()
+    cg_frac = (cg_x - pf().mac_le_x_ft) / pf().mac_ft
+    sm = static_margin_frac(cg_frac, vh_actual())
+    assert sm >= 0.08, f"static margin {sm:.1%} MAC"
