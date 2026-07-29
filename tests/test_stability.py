@@ -6,8 +6,8 @@ from seaez.ledger import cg, load_parts
 from seaez.params import DEFAULT
 from seaez.sizing import horizontal_tail_volume, planform, stall_speed_kt
 from seaez.stability import (
-    neutral_point_frac, static_margin_frac, tail_authority_moment_lbft,
-    thrust_couple_ratio, thrust_pitch_moment_lbft,
+    ROTATION_SPEED_FACTOR, neutral_point_frac, static_margin_frac,
+    tail_authority_moment_lbft, thrust_couple_ratio, thrust_pitch_moment_lbft,
 )
 
 PARTS = Path(__file__).parent.parent / "data" / "parts.yaml"
@@ -69,7 +69,7 @@ def test_gate_tail_counters_thrust_couple_at_rotation():
         thrust_lb=DEFAULT.static_thrust_lb,
         thrust_line_z_ft=DEFAULT.thrust_line_z_ft,
         cg_z_ft=cg_z,
-        speed_kt=1.2 * vs,
+        speed_kt=ROTATION_SPEED_FACTOR * vs,
         stab_area_sqft=DEFAULT.stab_area_sqft,
         tail_arm_ft=DEFAULT.tail_ac_x_ft - cg_x,
     )

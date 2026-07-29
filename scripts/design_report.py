@@ -14,9 +14,10 @@ from seaez.hydro import (
 )
 from seaez.ledger import cg, chute_lb, load_parts, rollup_empty_lb, EMPTY_WEIGHT_LIMIT_LB
 from seaez.params import DEFAULT
+from seaez.aerodata import load_airfoil, load_vspaero
 from seaez.roadmode import road_cg, tipover_ratio
 from seaez.sizing import horizontal_tail_volume, planform, stall_speed_kt, vertical_tail_volume
-from seaez.stability import static_margin_frac, thrust_couple_ratio
+from seaez.stability import ROTATION_SPEED_FACTOR, static_margin_frac, thrust_couple_ratio
 
 PARTS = Path(__file__).parent.parent / "data" / "parts.yaml"
 
@@ -41,7 +42,7 @@ def main() -> None:
     sm = static_margin_frac(mac_frac, vh)
     tc = thrust_couple_ratio(
         thrust_lb=p.static_thrust_lb, thrust_line_z_ft=p.thrust_line_z_ft, cg_z_ft=cg_z,
-        speed_kt=1.2 * vs, stab_area_sqft=p.stab_area_sqft, tail_arm_ft=tail_arm,
+        speed_kt=ROTATION_SPEED_FACTOR * vs, stab_area_sqft=p.stab_area_sqft, tail_arm_ft=tail_arm,
     )
     env = folded_envelope(p)
 
@@ -68,6 +69,22 @@ def main() -> None:
         ("tail/thrust-couple ratio @1.2Vs", f"{tc:.2f}", ">= 1.2"),
         ("folded width (ft)", f"{env.width_ft:.2f}", "< 5"),
         ("folded length (ft)", f"{env.length_ft:.1f}", "report: spec said 18-19"),
+    ]
+
+    af = load_airfoil()
+    va = load_vspaero()
+    vs_computed = stall_speed_kt(gross, p.wing_area_sqft, af.clmax_3d)
+    rows += [
+        ("airfoil (XFOIL, Re %.0fk)" % (af.reynolds_mac / 1e3),
+         af.selected, "clmax_2d %.2f" % af.clmax_2d),
+        ("CLmax_3D (0.90 x 2D)", f"{af.clmax_3d:.3f}", ">= 1.755 for 24 kt"),
+        ("stall @ COMPUTED CLmax (kt)", f"{vs_computed:.2f}",
+         f"<= {p.stall_limit_kt:.0f} — Ryan gate pending"),
+        ("static margin (%MAC, VSPAERO)", f"{va.static_margin_frac_mac:.1%}",
+         ">= 8% — Ryan gate pending (>0 gated)"),
+        ("CNbeta (/rad, VSPAERO w/ hull)", f"{va.cnb_per_rad:+.4f}", "> 0"),
+        ("SM cross-check |vsp - analytic|",
+         f"{abs(va.static_margin_frac_mac - sm):.1%}", "<= 8%"),
     ]
     w = max(len(r[0]) for r in rows)
     print(f"sea-ez design report — targets, not validated engineering\n{'-' * 60}")
