@@ -20,71 +20,66 @@ ROOT = Path(__file__).parent.parent
 
 # VLM SM sanity band. The brief's original 3-25% MAC band assumed the VLM
 # result would land lower than the analytic oracle (SM 11.5%) but still
-# stable. A 2026-07-29 diagnostic session (4 experiments, recorded in
-# DIAGNOSTICS below and in task-6-report.md) found the real VLM result is
-# -3.5% MAC (mildly unstable) and traced it to genuine aerodynamics, not a
-# script/reference bug: an alpha sweep, a tail-height perturbation, a
-# wake-convergence check, a panel-vs-VLM cross-check, and an untapered-wing
-# sanity anchor all confirm this. Per team-lead direction (2026-07-29), the
-# gate here now only screens for gross numerical/reference garbage; whether
-# -3.5% SM is acceptable for the design is a Task 8 Ryan-checkpoint call,
-# not this script's.
+# stable. A 2026-07-29 diagnostic session found the (then-buggy) wing
+# geometry gave SM=-3.5% MAC and traced it to two compounding real effects
+# (see task-6-report.md for that pre-fix table): (a) the wing itself was
+# built off-convention (zero-LE-sweep instead of chords-centered per
+# sizing.planform(), fixed in aero/vsp_model.py commit ce147d1), which alone
+# cost ~10 MAC points of wing-alone AC location, and (b) genuine tail-wake
+# proximity / hull destabilization, both real and still present post-fix.
+# Post wing-fix (2026-07-29 rerun, DIAGNOSTICS below), full-model SM
+# recovered to +5.46% MAC -- in the team lead's hand-checked +5..+8% MAC
+# expected range. The gate here screens for gross numerical/reference
+# garbage, not "must the design be stable" -- that's a Task 8
+# Ryan-checkpoint call, not this script's.
 SM_MIN_FRAC, SM_MAX_FRAC = -0.20, 0.30
 CNB_MIN_PER_RAD, CNB_MAX_PER_RAD = -0.02, 0.08
 
-# Recorded findings from the 2026-07-29 diagnostic session (not recomputed
-# on every run -- these are a point-in-time investigation of *why* SM comes
-# out negative, committed alongside the primary result for the Task 8
-# checkpoint). See task-6-report.md for full methodology and raw output.
+# Recorded findings from the 2026-07-29 post-wing-fix diagnostic rerun (not
+# recomputed on every run -- a point-in-time investigation, committed
+# alongside the primary result for the Task 8 checkpoint). The pre-fix
+# table (against the buggy zero-LE-sweep wing) is preserved in
+# task-6-report.md only, not here.
 DIAGNOSTICS = {
-    "alpha_sweep_cma_per_rad_no_hull": {
-        "-2": 0.2290, "0": 0.1416, "2": 0.0516, "4": -0.0406, "6": -0.1506,
+    "wing_alone_np_frac_mac_post_fix": 0.2404,
+    "wing_alone_note": (
+        "Post wing-fix (ce147d1, chords-centered LE sweep derived from "
+        "params), the isolated wing's VLM AC lands at 24.0% MAC -- matching "
+        "the textbook quarter-chord (~25%) almost exactly and confirming "
+        "the fix landed correctly in VLM terms. Pre-fix this read 14.5% "
+        "MAC (see task-6-report.md), a ~10-point forward shift caused by "
+        "the wing's zero-LE-sweep-with-taper bug, not a reference/MAC-math "
+        "bug (an untapered synthetic wing landed at ~24% even pre-fix)."
+    ),
+    "no_hull_sm_frac_mac_alpha2_post_fix": 0.0797,
+    "full_model_sm_frac_mac_alpha2_post_fix": 0.0546,
+    "hull_destabilization_note": (
+        "Hull costs ~2.5 MAC points (7.97% no-hull -> 5.46% full model), "
+        "consistent with the pre-fix isolation (also ~2.5 points) -- the "
+        "hull's own contribution is unchanged by the wing fix, as expected."
+    ),
+    "alpha_sweep_sm_frac_mac_no_hull_post_fix": {
+        "-2": 0.0467, "0": 0.0631, "2": 0.0797, "4": 0.0965, "6": 0.1165,
     },
     "alpha_sweep_note": (
-        "Smooth, monotonic, converged trend (not solver noise) -- consistent "
-        "with the wing wake sheet's position relative to the fixed-height "
-        "stab shifting with base alpha, not a numerical artifact."
-    ),
-    "wake_convergence_sm_frac_mac_full_model_alpha2": {
-        "wake_iters_5_default": -0.0351, "wake_iters_15": -0.0339, "wake_iters_30": -0.0339,
-    },
-    "wake_convergence_note": "Converged to <0.2 MAC points; not under-resolved.",
-    "tail_height_plus_1_5ft_no_hull_alpha2": {
-        "cma_baseline": 0.0516, "cma_stab_raised_1_5ft": 0.0929,
-        "sm_baseline_frac_mac": -0.0097, "sm_stab_raised_1_5ft_frac_mac": -0.0176,
-    },
-    "tail_height_note": (
-        "Raising the stab 1.5 ft (toward the wing's Z) made CMa MORE "
-        "destabilizing, not less -- opposite the a-priori guess, but it "
-        "proves strong sensitivity to tail height (i.e. wake proximity, not "
-        "a reference bug, drives the result); the wake sheet likely sits "
-        "near/at the wing's height band at this alpha."
-    ),
-    "panel_vs_vlm_sm_frac_mac_no_hull_alpha2": {"vlm": -0.0097, "panel": -0.0040},
-    "panel_vs_vlm_note": (
-        "Two independent solution methods agree to within 0.6 MAC points -- "
-        "not a VLM-specific implementation artifact."
-    ),
-    "wing_alone_np_frac_mac_anchor": {"taper_1_0_untapered": 0.2407, "taper_0_65_actual": 0.1454},
-    "wing_alone_note": (
-        "Untapered wing lands at 24.1% MAC, matching the textbook "
-        "quarter-chord AC (~25%) and confirming the MAC/reference pipeline "
-        "is correct. The actual params wing (taper 0.65, zero LE sweep) "
-        "lands at 14.5% -- a real ~10-point forward AC shift from taper "
-        "with an unswept LE (the c/4 line sweeps forward going outboard), "
-        "not a bug."
+        "Still a smooth, monotonic, ~0.9-point-per-degree trend -- the "
+        "SAME slope as pre-fix (pre-fix: -4.32% to +2.84% over the same "
+        "-2..6 alpha range, also ~0.9 pt/deg). The wing fix corrected the "
+        "baseline (isolated-wing AC), not the tail-wake-proximity effect; "
+        "that alpha-dependence is a real, separate, still-present physical "
+        "effect (tail sensitivity to wake position vs. alpha), and it did "
+        "NOT shrink -- it just no longer crosses zero within the tested "
+        "alpha range post-fix, since the whole curve shifted up ~10 points."
     ),
     "verdict": (
-        "SM=-3.5% MAC at the rotation-AoA condition is real, not a script or "
-        "reference artifact. It compounds three genuine effects: (1) taper "
-        "0.65 with zero LE sweep shifts the isolated wing's own AC ~10 MAC "
-        "points forward of the quarter-MAC assumption seaez/sizing.py's "
-        "V_h/V_v hand calc relies on; (2) the stab loses real effectiveness "
-        "to wing-wake proximity at this alpha (confirmed by cross-solver "
-        "agreement and height sensitivity); (3) the hull fuselage adds ~2.5 "
-        "further MAC points of destabilization. seaez/sizing.py has no "
-        "downwash term and assumes AC=quarter-MAC, so its +11.5% SM oracle "
-        "is optimistic for this short-coupled, low-tail layout."
+        "SM=+5.46% MAC (full model) / +7.97% MAC (no-hull) at the "
+        "rotation-AoA condition, post wing-fix. Matches the team lead's "
+        "hand-checked +5..+8% MAC expectation (10-point recovery from the "
+        "wing fix, minus real downwash + hull effects that are unchanged "
+        "by the fix and still present). seaez/sizing.py's 11.5% SM oracle "
+        "remains somewhat optimistic (no downwash term, and its AC=quarter-"
+        "MAC assumption for the wing is a simplification even post-fix), "
+        "but the design is now VLM-stable, not marginal/negative."
     ),
 }
 
