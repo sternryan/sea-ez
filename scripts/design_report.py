@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from seaez.foldmode import folded_envelope
 from seaez.hydro import (
     freeboard_at_step_ft, metacentric_height_ft, solve_waterline,
     sponson_touch_deg, WATER_LB_FT3,
@@ -14,7 +15,8 @@ from seaez.hydro import (
 from seaez.ledger import cg, chute_lb, load_parts, rollup_empty_lb, EMPTY_WEIGHT_LIMIT_LB
 from seaez.params import DEFAULT
 from seaez.roadmode import road_cg, tipover_ratio
-from seaez.sizing import planform, stall_speed_kt
+from seaez.sizing import horizontal_tail_volume, planform, stall_speed_kt, vertical_tail_volume
+from seaez.stability import static_margin_frac, thrust_couple_ratio
 
 PARTS = Path(__file__).parent.parent / "data" / "parts.yaml"
 
@@ -33,6 +35,16 @@ def main() -> None:
     vs = stall_speed_kt(gross, p.wing_area_sqft, p.cl_max)
     _rt, _rx, road_z = road_cg(parts, p)
 
+    tail_arm = p.tail_ac_x_ft - cg_x
+    vh = horizontal_tail_volume(p.stab_area_sqft, tail_arm, p.wing_area_sqft, pf.mac_ft)
+    vv = vertical_tail_volume(p.fin_area_sqft, tail_arm, p.wing_area_sqft, p.wing_span_ft)
+    sm = static_margin_frac(mac_frac, vh)
+    tc = thrust_couple_ratio(
+        thrust_lb=p.static_thrust_lb, thrust_line_z_ft=p.thrust_line_z_ft, cg_z_ft=cg_z,
+        speed_kt=1.2 * vs, stab_area_sqft=p.stab_area_sqft, tail_arm_ft=tail_arm,
+    )
+    env = folded_envelope(p)
+
     from design.geometry import hull_mesh
     hull = hull_mesh(p)
     wl = solve_waterline(hull, gross)
@@ -50,6 +62,12 @@ def main() -> None:
         ("hull-alone GM (ft)", f"{metacentric_height_ft(hull, wl, cg_z):.2f}", "report only"),
         ("sponson touch heel (deg)", f"{sponson_touch_deg(p, wl - hull.bounds[0][2]):.1f}", "<= 10"),
         ("road tipover threshold (g)", f"{tipover_ratio(road_z + DEFAULT.keel_to_ground_ft, p.track_width_ft):.2f}", ">= 0.4"),
+        ("horiz tail volume V_h", f"{vh:.3f}", ">= 0.35"),
+        ("vert tail volume V_v", f"{vv:.4f}", ">= 0.012"),
+        ("static margin (%MAC, analytic)", f"{sm:.1%}", ">= 8%"),
+        ("tail/thrust-couple ratio @1.2Vs", f"{tc:.2f}", ">= 1.2"),
+        ("folded width (ft)", f"{env.width_ft:.2f}", "< 5"),
+        ("folded length (ft)", f"{env.length_ft:.1f}", "report: spec said 18-19"),
     ]
     w = max(len(r[0]) for r in rows)
     print(f"sea-ez design report — targets, not validated engineering\n{'-' * 60}")
