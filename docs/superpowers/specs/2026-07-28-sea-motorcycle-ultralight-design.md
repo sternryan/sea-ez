@@ -81,7 +81,10 @@ conventional or inverted-V empennage clear of spray.
   a bike, won't fall over at the dock.
 - **Kolb-style aft-fold wing:** pivot at rear spar attach, wings swing aft, leading
   edges outboard, resting in cradles alongside tail boom. Folded width **< 5 ft**;
-  folded length ~18–19 ft.
+  folded length ~18–19 ft. *(AMENDED 2026-07-29, Ryan's ruling: the 18–19 ft estimate
+  fit the Firefly's 22 ft span; our 34 ft span folds to ~25.7 ft. ACCEPTED for v1 —
+  width remains the binding constraint; survey the road route for turn clearance
+  before build. See Phase 2.2 fold-envelope gate.)*
 - **Sponsons on outer wing panels** (Lake-amphib style): tucked in road mode,
   roll stability on water when spread. No separate hull sponsons.
 - **Engine high on pylon, pusher:** prop out of spray, out of rider's world,
