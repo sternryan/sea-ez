@@ -48,7 +48,7 @@ def _current_fingerprint() -> dict:
 def _check(fp: dict, path: Path) -> None:
     cur = _current_fingerprint()
     diffs = {k: (fp.get(k), cur[k]) for k in cur
-             if abs(float(fp.get(k, float("nan"))) - cur[k]) > 1e-3}
+             if k not in fp or abs(float(fp[k]) - cur[k]) > 1e-3}
     if diffs:
         raise StaleAeroData(f"{path.name} stale vs current params {diffs} — run make aero")
 

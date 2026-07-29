@@ -28,6 +28,20 @@ def test_stale_fingerprint_raises(tmp_path, monkeypatch):
         load_airfoil()
 
 
+def test_missing_fingerprint_key_raises(tmp_path, monkeypatch):
+    """GATE: a fingerprint missing a key must NOT pass as fresh (F1 fail-open
+    bug — NaN-vs-float comparisons are always False, so a dropped key used
+    to slip through silently)."""
+    import json, seaez.aerodata as ad
+    src = json.loads((Path("data/aero/airfoil_polars.json")).read_text())
+    del src["fingerprint"]["wing_area_sqft"]
+    bad = tmp_path / "airfoil_polars.json"
+    bad.write_text(json.dumps(src))
+    monkeypatch.setattr(ad, "AIRFOIL_JSON", bad)
+    with pytest.raises(StaleAeroData):
+        load_airfoil()
+
+
 def test_clmax_3d_derivation():
     a = load_airfoil()
     assert a.clmax_3d == pytest.approx(a.clmax_2d * CLMAX_3D_FACTOR, rel=1e-6)
