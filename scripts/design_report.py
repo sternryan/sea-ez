@@ -48,8 +48,8 @@ def main() -> None:
         ("static draft (ft)", f"{draft:.2f}", "< 75% depth"),
         ("freeboard @ step (ft)", f"{freeboard_at_step_ft(p, hull, wl):.2f}", ">= 0.33"),
         ("hull-alone GM (ft)", f"{metacentric_height_ft(hull, wl, cg_z):.2f}", "report only"),
-        ("sponson touch heel (deg)", f"{sponson_touch_deg(p, wl):.1f}", "<= 10"),
-        ("road tipover threshold (g)", f"{tipover_ratio(road_z, p.track_width_ft):.2f}", ">= 0.4"),
+        ("sponson touch heel (deg)", f"{sponson_touch_deg(p, wl - hull.bounds[0][2]):.1f}", "<= 10"),
+        ("road tipover threshold (g)", f"{tipover_ratio(road_z + DEFAULT.keel_to_ground_ft, p.track_width_ft):.2f}", ">= 0.4"),
     ]
     w = max(len(r[0]) for r in rows)
     print(f"sea-ez design report — targets, not validated engineering\n{'-' * 60}")

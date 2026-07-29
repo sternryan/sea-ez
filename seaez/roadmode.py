@@ -28,5 +28,6 @@ def road_cg(parts: list[Part], p: DesignParams) -> tuple[float, float, float]:
 
 def tipover_ratio(cg_z_ft: float, track_width_ft: float) -> float:
     """Lateral acceleration (in g) at which the trike lifts an inside wheel:
-    half-track over CG height. Static rigid-body estimate."""
+    half-track over CG height above the ground contact plane. Static
+    rigid-body estimate."""
     return (track_width_ft / 2.0) / cg_z_ft

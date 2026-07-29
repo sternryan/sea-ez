@@ -47,6 +47,7 @@ class DesignParams:
     track_width_ft: float = 3.0           # trike main-wheel track, inside folded envelope
     folded_width_limit_ft: float = 5.0    # spec §4 hard target (gated in Phase 2.2)
     folded_wing_z_ft: float = 2.2         # wings folded alongside boom: CG height estimate
+    keel_to_ground_ft: float = 0.5        # wheels-down keel-to-pavement clearance estimate; tipover uses CG height above GROUND
 
     @property
     def fuel_lb(self) -> float:

@@ -27,4 +27,4 @@ def test_gate_road_tipover_margin():
     lateral g — generous margin at 5-8 mph pedal speeds."""
     parts = load_parts(PARTS)
     _t, _x, cg_z = road_cg(parts, DEFAULT)
-    assert tipover_ratio(cg_z, DEFAULT.track_width_ft) >= 0.4
+    assert tipover_ratio(cg_z + DEFAULT.keel_to_ground_ft, DEFAULT.track_width_ft) >= 0.4

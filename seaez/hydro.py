@@ -70,7 +70,7 @@ def waterplane_ixx_ft4(mesh: trimesh.Trimesh, waterline_z: float) -> float:
     section = mesh.section(plane_origin=(0.0, 0.0, waterline_z), plane_normal=(0.0, 0.0, 1.0))
     if section is None:
         return 0.0
-    planar, _tf = section.to_planar()
+    planar, _tf = section.to_2D()
     ixx = 0.0
     for poly in planar.polygons_full:
         # to_planar maps mesh (x, y) -> polygon (x, y); centerline symmetry
@@ -97,12 +97,15 @@ def metacentric_height_ft(mesh: trimesh.Trimesh, waterline_z: float, kg_ft: floa
     return kb + bm - kg_ft
 
 
-def sponson_touch_deg(p, waterline_z: float) -> float:
+def sponson_touch_deg(p, waterline_above_keel_ft: float) -> float:
     """Heel angle at which the wingtip sponson bottom reaches the water.
-    Small-angle rigid roll about the waterline centerline."""
+    Small-angle rigid roll about the waterline centerline.
+    Datum note: waterline_above_keel_ft is the waterline height above the
+    keel baseline (the same datum as p.wing_z_ft) — NOT the mesh's own z
+    datum, which is offset from the keel baseline by the mesh's bounds[0][2]."""
     y = p.sponson_half_span_frac * p.wing_span_ft / 2.0
     sponson_bottom_z = p.wing_z_ft - p.sponson_bottom_below_wing_ft
-    height_above_wl = sponson_bottom_z - waterline_z
+    height_above_wl = sponson_bottom_z - waterline_above_keel_ft
     if height_above_wl <= 0:
         return 0.0
     return math.degrees(math.atan2(height_above_wl, y))

@@ -78,7 +78,7 @@ def test_gate_sponsons_touch_before_10_degrees(hull):
     """GATE (spec §4): wingtip sponsons engage the water at a small heel angle
     so the narrow hull never depends on its own (likely negative) GM."""
     wl = solve_waterline(hull, gross_lb())
-    angle = sponson_touch_deg(DEFAULT, wl)
+    angle = sponson_touch_deg(DEFAULT, wl - hull.bounds[0][2])
     assert 0.0 < angle <= 10.0, f"sponson touches at {angle:.1f} deg"
 
 
