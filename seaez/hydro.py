@@ -73,7 +73,7 @@ def waterplane_ixx_ft4(mesh: trimesh.Trimesh, waterline_z: float) -> float:
     planar, _tf = section.to_2D()
     ixx = 0.0
     for poly in planar.polygons_full:
-        # to_planar maps mesh (x, y) -> polygon (x, y); centerline symmetry
+        # to_2D maps mesh (x, y) -> polygon (x, y); centerline symmetry
         # puts the centroid on y~0, so moments are about the centerline.
         xs, ys = poly.exterior.coords.xy
         for i in range(len(xs) - 1):

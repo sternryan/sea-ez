@@ -4,8 +4,20 @@ version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = ["pyyaml>=6.0"]
 
+[tool.setuptools]
+packages = ["seaez"]
+
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
+cad = [
+    "cadquery>=2.4",
+    "trimesh>=4.0",
+    "numpy",
+    "shapely>=2.0",
+    "mapbox-earcut",
+    "networkx",
+    "matplotlib",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
