@@ -9,6 +9,10 @@ import yaml
 VALID_CLASSIFICATIONS = {"primary_structure", "secondary", "non_structural"}
 VALID_PROCESSES = {"composite_layup", "machined_metal", "fdm_print", "purchased"}
 
+# Part 103 empty-weight ceiling and legal ballistic-chute allowance (FAR 103.7 / spec §2).
+EMPTY_WEIGHT_LIMIT_LB = 254.0
+CHUTE_ALLOWANCE_LB = 24.0
+
 
 @dataclass(frozen=True)
 class Part:

@@ -2,10 +2,16 @@
 """Print the mass rollup and margin. Run: python scripts/margin_report.py"""
 from pathlib import Path
 
-from seaez.ledger import chute_lb, load_parts, rollup_empty_lb
+from seaez.ledger import (
+    chute_lb,
+    load_parts,
+    rollup_empty_lb,
+    EMPTY_WEIGHT_LIMIT_LB,
+    CHUTE_ALLOWANCE_LB,
+)
 from seaez.rules import violations
 
-LIMIT, CHUTE_ALLOWANCE = 254.0, 24.0
+LIMIT, CHUTE_ALLOWANCE = EMPTY_WEIGHT_LIMIT_LB, CHUTE_ALLOWANCE_LB
 
 parts = load_parts(Path(__file__).parent.parent / "data" / "parts.yaml")
 empty, chute = rollup_empty_lb(parts), chute_lb(parts)

@@ -2,12 +2,16 @@ from pathlib import Path
 
 import pytest
 
-from seaez.ledger import Part, load_parts, rollup_empty_lb, chute_lb
+from seaez.ledger import (
+    Part,
+    load_parts,
+    rollup_empty_lb,
+    chute_lb,
+    EMPTY_WEIGHT_LIMIT_LB,
+    CHUTE_ALLOWANCE_LB,
+)
 
 PARTS = Path(__file__).parent.parent / "data" / "parts.yaml"
-
-EMPTY_WEIGHT_LIMIT_LB = 254.0
-CHUTE_ALLOWANCE_LB = 24.0
 
 
 def test_parts_file_loads_and_is_nonempty():
@@ -40,3 +44,4 @@ def test_removable_items_flagged_not_counted():
     parts = load_parts(PARTS)
     names = {p.name: p for p in parts}
     assert names["accessory_battery_pack"].counts_toward_empty is True
+    assert not any("phone" in p.name or "ipad" in p.name for p in parts)

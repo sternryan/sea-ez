@@ -16,4 +16,5 @@ parts:
   - {name: instruments_sensors,    group: avionics,  mass_lb: 1.5,  classification: non_structural,     process: purchased,      counts_toward_empty: true,  is_chute: false}
   - {name: accessory_battery_pack, group: avionics,  mass_lb: 1.5,  classification: non_structural,     process: purchased,      counts_toward_empty: true,  is_chute: false}
   - {name: hardware_paint_misc,    group: misc,      mass_lb: 8.0,  classification: non_structural,     process: purchased,      counts_toward_empty: true,  is_chute: false}
+  # is_chute: true excludes this row from the empty rollup regardless of counts_toward_empty (see rollup_empty_lb).
   - {name: ballistic_parachute,    group: safety,    mass_lb: 22.0, classification: non_structural,     process: purchased,      counts_toward_empty: true,  is_chute: true}

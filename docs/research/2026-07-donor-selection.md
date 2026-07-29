@@ -98,9 +98,10 @@ matters separately from fold mechanism):**
   strips + ply web) that is straightforward to reverse-engineer into a CadQuery
   parametric spar, consistent with spec §6's composite/foam-core philosophy
   (spar loads seed the laminate schedule, not the material itself — spec §6). The
-  Legal Eagle XL's wing area (120.3 sq ft) also sits inside the spec's target
-  135–150 sq ft range better than the Firefly's 117 sq ft once scaled, though
-  scaling math is a CAD-phase task, not this memo's.
+  Legal Eagle XL's wing area (120.3 sq ft) is also closer to the spec's target
+  135–150 sq ft range than the Firefly's 117 sq ft, meaning less scaling would be
+  required to reach it — though neither figure falls inside the range as
+  published, and the scaling math itself is a CAD-phase task, not this memo's.
 - **Aero/planform baseline: Kolb Firefly, with the caveat that its 117 sq ft wing
   area is below the spec's 135–150 sq ft target** (spec §3 already flags this:
   "donor planform expected to land in range — Kolb Firefly ≈ 130 sq ft" — note
@@ -142,10 +143,9 @@ matters separately from fold mechanism):**
 
 ## 6. Open risks
 
-- **Spec §3's ≈130 sq ft Firefly wing-area estimate vs. this memo's sourced
-  117 sq ft is unreconciled.** If 117 sq ft is correct, the donor planform needs
-  more scaling to reach the 135–150 sq ft target than the spec assumed. Resolve
-  before CAD.
+- **CLOSED — Spec §3's ≈130 sq ft Firefly wing-area estimate vs. this memo's
+  sourced 117 sq ft.** The spec was corrected to 117 sq ft in commit 727d978,
+  citing this memo as the source.
 - **No candidate's spar data is verified without a plans purchase.** This memo's
   recommendation (Legal Eagle XL structure + Firefly fold) is a best-available
   call from public sources; it could change once the actual plans are in hand —
