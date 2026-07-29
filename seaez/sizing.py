@@ -12,6 +12,7 @@ from dataclasses import dataclass
 
 RHO_SL_SLUG_FT3 = 0.0023769   # sea-level standard air density
 FPS_PER_KT = 1.68781
+AIR_KINEMATIC_VISCOSITY_FT2_S = 1.5722e-4  # sea-level standard, mu/rho
 
 
 def stall_speed_kt(gross_lb: float, wing_area_sqft: float, cl_max: float) -> float:
@@ -23,6 +24,11 @@ def stall_speed_kt(gross_lb: float, wing_area_sqft: float, cl_max: float) -> flo
 def wing_area_for_stall(gross_lb: float, stall_kt: float, cl_max: float) -> float:
     v_fps = stall_kt * FPS_PER_KT
     return 2.0 * gross_lb / (RHO_SL_SLUG_FT3 * cl_max * v_fps**2)
+
+
+def reynolds(speed_kt: float, chord_ft: float) -> float:
+    """Chord Reynolds number at sea-level standard conditions."""
+    return speed_kt * FPS_PER_KT * chord_ft / AIR_KINEMATIC_VISCOSITY_FT2_S
 
 
 @dataclass(frozen=True)

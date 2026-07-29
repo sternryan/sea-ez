@@ -85,3 +85,9 @@ def test_gate_vertical_tail_volume():
         DEFAULT.fin_area_sqft, tail_arm_ft(), DEFAULT.wing_area_sqft, DEFAULT.wing_span_ft,
     )
     assert vv >= 0.012, f"V_v = {vv:.4f}"
+
+
+def test_reynolds_at_stall_mac():
+    # Vs 23.69 kt, MAC 4.1794 ft, nu 1.5722e-4 -> Re ~= 1.063e6
+    from seaez.sizing import reynolds
+    assert reynolds(23.69, 4.1794) == pytest.approx(1.063e6, rel=0.01)
