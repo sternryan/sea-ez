@@ -24,6 +24,7 @@ command -v cmake      >/dev/null || { echo "need brew cmake"; exit 1; }
   ./OpenVSP-3.51.2-MacOS/python/utilities \
   ./OpenVSP-3.51.2-MacOS/python/openvsp_config \
   ./OpenVSP-3.51.2-MacOS/python/openvsp
+./venv313/bin/pip -q install pytest  # required by `make aero-test`
 
 [ -d xfoil-src ] || git clone -q --depth 1 https://github.com/RobotLocomotion/xfoil.git xfoil-src
 [ -x xfoil-src/build/src/xfoil ] || {
