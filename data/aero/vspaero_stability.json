@@ -8,8 +8,8 @@
   "stall_limit_kt": 24.0,
   "stab_area_sqft": 21.0,
   "fin_area_sqft": 6.0,
-  "tail_ac_x_ft": 17.4,
-  "cg_x_ft": 7.1403,
+  "tail_ac_x_ft": 19.9,
+  "cg_x_ft": 7.2238,
   "cg_z_ft": 2.1089,
   "wing_center_x_ft": 7.9,
   "wing_z_ft": 3.35,
@@ -24,17 +24,17 @@
   "sref_sqft": 140.0,
   "bref_ft": 34.0,
   "cref_ft": 4.1794,
-  "xcg_ft": 7.1403,
+  "xcg_ft": 7.2238,
   "zcg_ft": 2.1089,
-  "vinf_kt": 28.43
+  "vinf_kt": 28.51
  },
  "derivatives": {
-  "CMa_per_rad": -0.2892,
-  "CLa_per_rad": 5.297,
-  "CNb_per_rad": 0.0412,
-  "neutral_point_frac_mac": 0.3728
+  "CMa_per_rad": -0.4239,
+  "CLa_per_rad": 5.3012,
+  "CNb_per_rad": 0.048,
+  "neutral_point_frac_mac": 0.4182
  },
- "static_margin_frac_mac": 0.0546,
+ "static_margin_frac_mac": 0.08,
  "diagnostics": {
   "wing_alone_np_frac_mac_post_fix": 0.2404,
   "wing_alone_note": "Post wing-fix (ce147d1, chords-centered LE sweep derived from params), the isolated wing's VLM AC lands at 24.0% MAC -- matching the textbook quarter-chord (~25%) almost exactly and confirming the fix landed correctly in VLM terms. Pre-fix this read 14.5% MAC (see task-6-report.md), a ~10-point forward shift caused by the wing's zero-LE-sweep-with-taper bug, not a reference/MAC-math bug (an untapered synthetic wing landed at ~24% even pre-fix).",
