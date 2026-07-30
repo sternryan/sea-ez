@@ -14,7 +14,7 @@ from seaez.hydro import (
 )
 from seaez.ledger import cg, chute_lb, load_parts, rollup_empty_lb, EMPTY_WEIGHT_LIMIT_LB
 from seaez.params import DEFAULT
-from seaez.aerodata import load_airfoil, load_vspaero
+from seaez.aerodata import CLMAX_3D_FACTOR, load_airfoil, load_vspaero
 from seaez.roadmode import road_cg, tipover_ratio
 from seaez.sizing import horizontal_tail_volume, planform, stall_speed_kt, vertical_tail_volume
 from seaez.stability import ROTATION_SPEED_FACTOR, static_margin_frac, thrust_couple_ratio
@@ -73,15 +73,18 @@ def main() -> None:
 
     af = load_airfoil()
     va = load_vspaero()
-    vs_computed = stall_speed_kt(gross, p.wing_area_sqft, af.clmax_3d)
+    landing_clmax_3d = (af.clmax_2d + p.flap_dclmax_2d) * CLMAX_3D_FACTOR
+    vs_computed = stall_speed_kt(gross, p.wing_area_sqft, landing_clmax_3d)
     rows += [
         ("airfoil (XFOIL, Re %.0fk)" % (af.reynolds_mac / 1e3),
          af.selected, "clmax_2d %.2f" % af.clmax_2d),
-        ("CLmax_3D (0.90 x 2D)", f"{af.clmax_3d:.3f}", ">= 1.755 for 24 kt"),
-        ("stall @ COMPUTED CLmax (kt)", f"{vs_computed:.2f}",
-         f"<= {p.stall_limit_kt:.0f} — Ryan gate pending"),
+        ("flaperon dCLmax_2d", f"+{p.flap_dclmax_2d:.2f}",
+         "landing config, 2.3b builds it"),
+        ("CLmax_3D landing (0.90 x (2D+flap))", f"{landing_clmax_3d:.3f}", ">= 1.755 for 24 kt"),
+        ("stall @ COMPUTED landing CLmax (kt)", f"{vs_computed:.2f}",
+         f"<= {p.stall_limit_kt:.0f}"),
         ("static margin (%MAC, VSPAERO)", f"{va.static_margin_frac_mac:.1%}",
-         ">= 8% — Ryan gate pending (>0 gated)"),
+         ">= 8%"),
         ("CNbeta (/rad, VSPAERO w/ hull)", f"{va.cnb_per_rad:+.4f}", "> 0"),
         ("SM cross-check |vsp - analytic|",
          f"{abs(va.static_margin_frac_mac - sm):.1%}", "<= 8%"),

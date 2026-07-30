@@ -48,24 +48,27 @@ def test_clmax_3d_derivation():
     assert 1.2 <= a.clmax_3d <= 2.0            # sanity band
 
 
-def test_report_computed_stall_vs_limit():
-    """REPORT (gate decision is Task 8 / Ryan): stall at the COMPUTED
-    CLmax_3D vs the 24 kt ceiling. Required CLmax_3D at 479 lb / 140 sqft
-    is 1.755 — print both, assert nothing about the comparison."""
+def test_gate_landing_config_stall_within_limit():
+    """GATE (Ryan ruling 2026-07-29): landing-config CLmax_3D = (2D airfoil
+    clmax + flap_dclmax_2d) x CLMAX_3D_FACTOR must produce a stall speed
+    <= stall_limit_kt at gross, AND params.cl_max (the design target) may
+    never exceed that computed capability — the honesty gate."""
     a = load_airfoil()
+    landing_clmax_3d = (a.clmax_2d + DEFAULT.flap_dclmax_2d) * CLMAX_3D_FACTOR
     vs = stall_speed_kt(_current_fingerprint()["gross_lb"],
-                        DEFAULT.wing_area_sqft, a.clmax_3d)
-    print(f"computed stall {vs:.2f} kt @ CLmax_3D {a.clmax_3d:.3f} (limit 24)")
+                        DEFAULT.wing_area_sqft, landing_clmax_3d)
+    print(f"computed landing stall {vs:.2f} kt @ CLmax_3D {landing_clmax_3d:.3f} (limit 24)")
+    assert vs <= DEFAULT.stall_limit_kt
+    assert DEFAULT.cl_max <= landing_clmax_3d
 
 
 def test_gate_vspaero_static_margin():
-    """GATE (amended mid-phase, controller ruling in SDD ledger): VSPAERO
-    SM must be POSITIVE (stable). The original >=8% threshold is Ryan-pending
-    at the Task 8 checkpoint — computed SM is +5.46% MAC (real finding:
-    short-coupled tail in wing downwash; ~0.9 pt/deg alpha sensitivity).
-    Report row carries the 8% target."""
+    """GATE: VSPAERO SM >= 8% MAC — threshold restored per Ryan ruling
+    2026-07-29 (boom extended +1.5 ft to move the tail out of the
+    strongest wake-proximity zone; see docs/research/2026-07-29-airfoil-
+    clmax-finding.md RESOLUTION)."""
     v = load_vspaero()
-    assert v.static_margin_frac_mac > 0.0
+    assert v.static_margin_frac_mac >= 0.08
 
 
 def test_gate_vspaero_directional_stability():
@@ -76,6 +79,10 @@ def test_gate_vspaero_directional_stability():
 
 def test_crosscheck_vspaero_vs_analytic_sm():
     """GATE: computed and analytic SM agree within 8 %MAC — divergence
-    beyond that means a broken model or a broken analytic assumption."""
+    beyond that means a broken model or a broken analytic assumption.
+    Analytic reference recomputed for the +2.5 ft boom / tail_ac_x_ft 19.9
+    (Ryan ruling 2026-07-29, acceptance-check max iteration — +1.5 ft gave
+    7.54%, +2.0 ft gave 7.66%, +2.5 ft gave exactly 8.0% MAC): NP 47.62% -
+    CG 33.82% = 13.80% MAC."""
     v = load_vspaero()
-    assert abs(v.static_margin_frac_mac - 0.115) <= 0.08
+    assert abs(v.static_margin_frac_mac - 0.138) <= 0.08

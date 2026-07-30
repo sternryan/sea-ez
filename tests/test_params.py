@@ -25,7 +25,7 @@ def test_tail_thrust_fold_params():
     p = DEFAULT
     assert p.stab_area_sqft == pytest.approx(21.0)        # 8.4 x 2.5, sized for V_h gate
     assert p.fin_area_sqft == 6.0
-    assert p.tail_ac_x_ft == 17.4                          # massing_v0 tail AC station
+    assert p.tail_ac_x_ft == 19.9                          # +2.5 ft boom extension (max iteration to clear SM 8% floor), Ryan ruling 2026-07-29
     assert p.static_thrust_lb == 165.0                     # Moster-185-class static thrust TARGET
     assert p.thrust_line_z_ft == 4.35                      # massing_v0 prop center height
     assert p.fold_pivot_x_ft == 9.4

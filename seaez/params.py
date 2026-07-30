@@ -11,7 +11,10 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class DesignParams:
     # --- Regulatory / design point ---
-    gross_design_lb: float = 490.0        # spec §3: gross ~470-500 lb
+    gross_design_lb: float = 488.0        # stall-limited: max gross for 24 kt at CLmax 1.79 /
+                                          # 140 sqft is 488.8 (was 490; spec §3 band 470-500
+                                          # intact; actual rollup 479 -- 9 lb growth margin;
+                                          # Ryan veto point 2026-07-29
     pilot_lb: float = 190.0               # spec §3: design pilot + gear
     fuel_capacity_gal: float = 5.0        # FAR 103.7 / spec §2
     fuel_density_lb_per_gal: float = 6.0  # 2-stroke premix, ~gasoline density
@@ -23,8 +26,12 @@ class DesignParams:
     wing_taper_ratio: float = 0.65        # tip/root, matches massing_v0
     wing_center_x_ft: float = 7.9         # unswept, chords centered here (massing_v0)
     wing_z_ft: float = 3.35               # spine 1.35 + 2.0 above spine (massing_v0)
-    cl_max: float = 1.8                   # spec §3: high-lift ultralight airfoil TARGET —
-                                          # unverified until airfoil chosen (donor memo §2 gaps)
+    cl_max: float = 1.79                  # landing-config CLmax_3D target = (usa35b 1.694 +
+                                          # flap 0.3) x 0.90 = 1.7946, rounded DOWN conservative;
+                                          # consistency-gated against computed aerodata
+    flap_dclmax_2d: float = 0.3           # full-span flaperons, plain-flap low end;
+                                          # Ryan ruling 2026-07-29; landing config counts
+                                          # toward FAR 103 stall
 
     # --- Rider / loadout stations (bow datum X, keel-baseline Z, massing_v0 frame) ---
     seat_x_ft: float = 6.3
@@ -54,8 +61,8 @@ class DesignParams:
     stab_span_ft: float = 8.4
     stab_chord_ft: float = 2.5
     fin_area_sqft: float = 6.0
-    tail_ac_x_ft: float = 17.4            # stab quarter-chord AC station (bow datum); massing_v0's 17.4 was the OLD 1.4-chord stab's geometric center — same number, now an honest AC via the boom extension (see overall_length_ft)
-    overall_length_ft: float = 19.4       # airframe length incl. tail: boom EXTENDED from massing_v0's 18.5 so the 2.5 ft-chord stab's quarter-chord AC sits at tail_ac_x_ft (TE at 19.275 + tailcone). Boom mass delta lands in the 2.3 laminate accounting.
+    tail_ac_x_ft: float = 19.9            # stab quarter-chord AC station (bow datum); +2.5 ft boom extension per Ryan ruling 2026-07-29 (SM lever, wake-proximity fix — +1.5 ft gave 7.54% MAC, +2.0 ft gave 7.66% MAC, both short of the 8% floor; extended to the ruling's stated max of 2.5 ft total)
+    overall_length_ft: float = 21.9       # airframe length incl. tail: +2.5 ft boom (max per ruling 2026-07-29) so the 2.5 ft-chord stab's quarter-chord AC sits at tail_ac_x_ft. Mass delta stays parked for 2.3b laminate (tail mass 16 lb unchanged).
 
     # --- Propulsion geometry (spec §3-4; thrust is a TARGET until measured) ---
     static_thrust_lb: float = 165.0       # Moster 185 class ~75 kgf static; conservative max for couple

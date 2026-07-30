@@ -5,7 +5,7 @@
 parts:
   - {name: wing_assembly,          group: wing,      mass_lb: 62.0, classification: primary_structure, process: composite_layup, counts_toward_empty: true,  is_chute: false, x_ft: 7.9,  z_ft: 3.35}
   - {name: hull_chassis,           group: hull,      mass_lb: 55.0, classification: primary_structure, process: composite_layup, counts_toward_empty: true,  is_chute: false, x_ft: 5.5,  z_ft: 0.8}
-  - {name: tail_boom_empennage,    group: tail,      mass_lb: 16.0, classification: primary_structure, process: composite_layup, counts_toward_empty: true,  is_chute: false, x_ft: 15.5, z_ft: 1.2}
+  - {name: tail_boom_empennage,    group: tail,      mass_lb: 16.0, classification: primary_structure, process: composite_layup, counts_toward_empty: true,  is_chute: false, x_ft: 18.0, z_ft: 1.2}
   - {name: foreplane_module,       group: foreplane, mass_lb: 4.0,  classification: primary_structure, process: composite_layup, counts_toward_empty: true,  is_chute: false, x_ft: 1.1,  z_ft: 2.05}
   - {name: engine_mount_exhaust,   group: propulsion, mass_lb: 34.0, classification: primary_structure, process: purchased,      counts_toward_empty: true,  is_chute: false, x_ft: 9.4,  z_ft: 4.3}
   - {name: prop,                   group: propulsion, mass_lb: 8.0,  classification: primary_structure, process: purchased,      counts_toward_empty: true,  is_chute: false, x_ft: 9.9,  z_ft: 4.35}
