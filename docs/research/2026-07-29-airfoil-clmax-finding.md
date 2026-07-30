@@ -242,3 +242,58 @@ sea-ez design report — targets, not validated engineering
 54 tests passed, 23 report rows, all gates green (including the two
 intentionally-non-asserting/amended rows that carry the Ryan-pending findings
 above).
+
+---
+
+## RESOLUTION (2026-07-29, Ryan)
+
+Both decisions ruled:
+
+- **Decision 1 (stall lever): flaperons.** Full-span flaperons (not partial-
+  span), plain-flap low end, `flap_dclmax_2d = 0.3`. `params.cl_max`
+  repointed 1.8 -> **1.79** (landing-config CLmax_3D = (usa35b clmax_2d
+  1.694 + 0.3) x 0.90 = 1.7946, rounded DOWN conservative). The mechanism
+  (flaperon spar/rib work) is scoped to **2.3b**, not this phase.
+- **Decision 2 (SM lever): longer boom.** Extended in the acceptance-check's
+  0.5 ft steps: +1.5 ft gave 7.54% MAC, +2.0 ft gave 7.66% MAC, +2.5 ft
+  (the ruling's stated ceiling) gave exactly **8.0% MAC** — clears the
+  restored 8% floor at the max allowed extension, no headroom to spare.
+  `tail_ac_x_ft` 17.4 -> 19.9, `overall_length_ft` 19.4 -> 21.9,
+  `data/parts.yaml` tail_boom_empennage x_ft 15.5 -> 18.0. Boom laminate
+  mass delta stays parked for **2.3b**, per the earlier ruling (tail mass
+  16 lb unchanged).
+
+**Final numbers (re-locked, `make aero` + `make gates` re-run):** gross
+479.0 lb, gross CG 33.8% MAC (in the 25-35% gate), V_h 0.455, V_v 0.0160,
+analytic SM 13.8%, VSPAERO SM 8.0% MAC (>= 8% gate), CNβ +0.0480/rad,
+stall @ computed landing CLmax_3D (1.795) = 23.73 kt (<= 24 kt gate),
+thrust/tail-couple ratio 1.60 (up from 1.29). Folded envelope unchanged
+(width 4.70 ft, length 25.7 ft — the wing panel governs, not the boom).
+
+Both gates in `tests/test_aerodata.py` are now ASSERTED (SM >= 8%; landing
+stall <= 24 kt AND `params.cl_max <= computed landing CLmax_3D`, the
+honesty gate) — no more "Ryan gate pending" rows.
+
+**Known thin margin, disclosed not hidden:** the SM lever cleared the floor
+by landing exactly on it (8.0% at the ruling's maximum permitted extension)
+— there was no slack lever left within the 2.5 ft ceiling if the computed
+number had come in a hair lower. Separately, an unrelated pre-existing test
+(`test_gate_stall_at_design_gross_within_limit`, checking stall at the top
+of the spec §3 470-500 lb design-gross band rather than the actual 479 lb
+built gross) initially failed by 0.03 kt (24.03 vs the 24 kt ceiling) as a
+side-effect of `cl_max` dropping to 1.79 — it was already passing by only
+0.035 kt under the old 1.8 target. Resolved below, not silently patched.
+
+**Design max gross veto point (2026-07-29, Ryan, controller ruling):** the
+design gross is now stall-limited by the tightened `cl_max`. Max gross for
+the 24.00 kt ceiling at CLmax 1.79 / S=140 is 479 x (24/23.76)^2 = 488.8 lb
+(computed from the actual-gross stall figure above). `gross_design_lb`
+490.0 -> **488.0** (spec §3's 470-500 lb band is unchanged as a spec
+statement; this is the internal design-point ceiling inside that band).
+Verified stall @ 488 lb = 23.98 kt <= 24 kt. Actual ledger rollup stays at
+479 lb, so there remains 9 lb of growth margin before the new design
+ceiling. No other test or report consumer of `gross_design_lb` was
+affected (grep-verified: only `test_default_params_match_spec_design_point`,
+which checks `470 <= gross_design_lb <= 500` and stays green at 488, and
+`test_gate_stall_at_design_gross_within_limit` itself, now green on real
+numbers with semantics unchanged).
