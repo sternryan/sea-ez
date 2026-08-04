@@ -1,11 +1,14 @@
 name: ci
 on: [push, pull_request]
 jobs:
-  test:
+  gates:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: python -m venv .venv && .venv/bin/pip install -e ".[dev]"
-      - run: make test
+      # tests/test_hydro.py imports trimesh, so the cad extra is required to
+      # collect the suite at all -- ".[dev]" alone fails on a clean checkout.
+      - run: python -m venv .venv && .venv/bin/pip install -e ".[dev,cad]"
+      # run the gates, not just the tests: the margin report IS the deliverable
+      - run: make gates
