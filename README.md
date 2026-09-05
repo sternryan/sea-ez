@@ -17,33 +17,45 @@ on every push.
   empty weight (lb)                         237.0   [<= 254]
   chute (lb)                                 22.0   [<= 24]
   gross w/ pilot+fuel (lb)                  479.0   [470-500]
-  stall @ gross, CLmax 1.79 (kt)            23.76   [<= 24]
-  gross CG (%MAC)                           33.8%   [25-35%]
+  stall @ gross, CLmax 1.79 (kt)            23.19   [<= 24]
+  gross CG (%MAC)                           34.6%   [25-35%]
   hull volume (ft^3)                         27.4   [>= foam reserve 2x1.5xW]
   static draft (ft)                          0.64   [< 75% depth]
   freeboard @ step (ft)                      1.31   [>= 0.33]
   hull-alone GM (ft)                        -0.76   [report only]
   sponson touch heel (deg)                    5.0   [<= 10]
   road tipover threshold (g)                 0.58   [>= 0.4]
-  horiz tail volume V_h                     0.455   [>= 0.35]
-  vert tail volume V_v                     0.0160   [>= 0.012]
-  static margin (%MAC, analytic)            13.8%   [>= 8%]
-  tail/thrust-couple ratio @1.2Vs            1.60   [>= 1.2]
-  folded width (ft)                          4.70   [< 5]
+  horiz tail volume V_h                     0.413   [>= 0.35]
+  vert tail volume V_v                     0.0152   [>= 0.012]
+  static margin (%MAC, analytic)            10.9%   [>= 8%]
+  tail/thrust-couple ratio @1.2Vs            1.53   [>= 1.2]
+  folded width (ft)                          4.76   [< 5]
   folded length (ft)                         25.7   [report: spec said 18-19]
-  airfoil (XFOIL, Re 1066k)                usa35b   [clmax_2d 1.69]
+  airfoil (XFOIL, Re 1092k)                usa35b   [clmax_2d 1.70]
   flaperon dCLmax_2d                        +0.30   [landing config, 2.3b builds it]
-  CLmax_3D landing (0.90 x (2D+flap))       1.795   [>= 1.755 for 24 kt]
-  stall @ COMPUTED landing CLmax (kt)       23.73   [<= 24]
-  static margin (%MAC, VSPAERO)              8.0%   [>= 8%]
-  CNbeta (/rad, VSPAERO w/ hull)          +0.0480   [> 0]
-  SM cross-check |vsp - analytic|            5.8%   [<= 8%]
+  CLmax_3D landing (0.90 x (2D+flap))       1.800   [>= 1.755 for 24 kt]
+  stall @ COMPUTED landing CLmax (kt)       23.12   [<= 24]
+  static margin (%MAC, VSPAERO)              5.6%   [Ryan-pending; was >= 8%, see note below]
+  CNbeta (/rad, VSPAERO w/ hull)          +0.0443   [> 0]
+  SM cross-check |vsp - analytic|            5.4%   [<= 8%]
 ```
 
-The tight ones are the interesting ones. Static margin sits at exactly the 8% floor under
-VSPAERO with zero margin, stall computes to 23.73 kt against a hard regulatory 24, and empty
-weight has 17 lb of headroom against the Part 103 ceiling. Those three drive every subsequent
-decision.
+**2026-09-05 (Ryan ruling):** wing area 140 -> 147 sq ft (still inside spec §3's 135-150 sq ft
+band). At 140 sq ft, stall busted the 24 kt ceiling at just 4.7% structure-weight creep — under
+half the 5-10% build-weight risk band this project has always assumed. 147 sq ft holds 24 kt
+through +15% structure creep. See `docs/research/2026-09-05-gating-numbers.md`. Side effect:
+growing the wing shifted MAC and CG enough that VSPAERO static margin dropped from 8.0% to
+5.6%, busting the 8% floor. The lever that closed this gate on 2026-07-29 (tail boom length)
+is already at its ruled ceiling (+2.5 ft) — re-opening it needs a new Ryan ruling, not a rerun
+of the old one, so `tests/test_aerodata.py::test_gate_vspaero_static_margin` is **downgraded
+to Ryan-pending** (asserts SM > 0, the same pattern the repo used the first time this gate
+went pending) until that ruling lands. The crosscheck gate's analytic reference was recomputed
+for the new wing area and still passes. Tracked in `~/.claude/state/needs-ryan-2026-09-05.md`
+item 38.
+
+The tight ones are the interesting ones. Static margin now runs *below* the 8% floor under
+VSPAERO, stall computes to 23.12 kt against a hard regulatory 24, and empty weight has 17 lb of
+headroom against the Part 103 ceiling. Those three drive every subsequent decision.
 
 ## Run it
 

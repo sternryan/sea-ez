@@ -21,7 +21,12 @@ class DesignParams:
     stall_limit_kt: float = 24.0          # spec §2: power-off stall ceiling
 
     # --- Wing (spec §3-4; Firefly planform scaled UP from 117 sq ft, donor memo §4) ---
-    wing_area_sqft: float = 140.0
+    # 140 -> 147 sq ft: Ryan ruling 2026-09-05, per docs/research/2026-09-05-gating-numbers.md.
+    # Stall busts the 24 kt Part 103 ceiling at just 4.7% structure-weight creep at 140 sqft
+    # (vs. the README's assumed 5-10% build-weight risk band). 147 sqft (+5.0%, inside spec
+    # §3's 135-150 sqft band) holds 24 kt through +15% structure creep without asking the
+    # unbuilt flaperon / unconfirmed airfoil to outperform its CLmax target instead.
+    wing_area_sqft: float = 147.0
     wing_span_ft: float = 34.0            # matches design/massing_v0.py
     wing_taper_ratio: float = 0.65        # tip/root, matches massing_v0
     wing_center_x_ft: float = 7.9         # unswept, chords centered here (massing_v0)

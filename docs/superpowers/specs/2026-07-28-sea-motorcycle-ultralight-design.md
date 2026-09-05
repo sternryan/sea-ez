@@ -51,6 +51,14 @@ anyway).
   airfoil; note the Kolb Firefly is 117 sq ft per published specs — our wing
   scales UP from the donor planform; the 24 kt stall math governs, see
   docs/research/2026-07-donor-selection.md)
+  - **2026-09-05 (Ryan ruling):** design-point pinned at **147 sq ft** (was 140,
+    still inside this band). At 140 sq ft the 24 kt ceiling busted at just 4.7%
+    structure-weight creep — under half the README's assumed 5-10% build-weight
+    risk band. 147 sq ft holds 24 kt through +15% creep. See
+    docs/research/2026-09-05-gating-numbers.md. Side effect: VSPAERO static
+    margin dropped from 8.0% to 5.6%, below the 8% floor (`tests/test_aerodata.py`)
+    — the boom-length lever that closed this gate on 2026-07-29 is already at its
+    ruled ceiling (+2.5 ft), so this is a follow-on for Ryan, not fixed here.
 - Power: **28–35 hp gas pusher** (Vittorazi Moster 185 / Polini Thor class),
   premix 2-stroke, magneto ignition, pull start
 - Cruise target: 45–55 kt (deliberately draggy is acceptable; 103 caps speed)
