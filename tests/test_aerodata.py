@@ -66,14 +66,16 @@ def test_gate_vspaero_static_margin():
     """GATE (Ryan-pending, downgraded 2026-09-05): the >= 8% MAC floor
     restored per Ryan ruling 2026-07-29 no longer holds after wing area
     grew 140 -> 147 sq ft (2026-09-05 ruling, see docs/research/2026-09-05-
-    gating-numbers.md) shifted MAC/CG/NP -- VSPAERO SM is now 5.6%. The
-    lever that closed this gate before (tail boom +2.5 ft) is already at
-    its 2026-07-29 ruled ceiling, so re-tightening this floor needs a new
-    Ryan ruling, not a code fix. Tracked in
-    ~/.claude/state/needs-ryan-2026-09-05.md item 38. Until ruled,
-    only assert the airframe is still statically stable (SM > 0), same
-    downgrade pattern the repo used the first time this gate went
-    Ryan-pending (see e4988af)."""
+    gating-numbers.md) shifted MAC/CG/NP -- VSPAERO SM is now 5.6%. Ryan
+    ruling 2026-09-05: the floor becomes 6% for now (boom length -- the
+    lever that closed this gate on 2026-07-29, already at its ruled
+    +2.5 ft ceiling -- gets revisited once real weights exist). 5.6% still
+    does not clear the new 6% floor, so this stays Ryan-pending rather than
+    closing outright; tracked in ~/.claude/state/needs-ryan-2026-09-05.md
+    item 38. Until boom/weights close the remaining 0.4pp, only assert the
+    airframe is still statically stable (SM > 0), same downgrade pattern
+    the repo used the first time this gate went Ryan-pending (see
+    e4988af)."""
     v = load_vspaero()
     assert v.static_margin_frac_mac > 0.0
 

@@ -35,7 +35,7 @@ on every push.
   flaperon dCLmax_2d                        +0.30   [landing config, 2.3b builds it]
   CLmax_3D landing (0.90 x (2D+flap))       1.800   [>= 1.755 for 24 kt]
   stall @ COMPUTED landing CLmax (kt)       23.12   [<= 24]
-  static margin (%MAC, VSPAERO)              5.6%   [Ryan-pending; was >= 8%, see note below]
+  static margin (%MAC, VSPAERO)              5.6%   [Ryan-pending; floor 6% (Ryan ruling 2026-09-05), was >= 8%, see note below]
   CNbeta (/rad, VSPAERO w/ hull)          +0.0443   [> 0]
   SM cross-check |vsp - analytic|            5.4%   [<= 8%]
 ```
@@ -47,11 +47,12 @@ through +15% structure creep. See `docs/research/2026-09-05-gating-numbers.md`. 
 growing the wing shifted MAC and CG enough that VSPAERO static margin dropped from 8.0% to
 5.6%, busting the 8% floor. The lever that closed this gate on 2026-07-29 (tail boom length)
 is already at its ruled ceiling (+2.5 ft) — re-opening it needs a new Ryan ruling, not a rerun
-of the old one, so `tests/test_aerodata.py::test_gate_vspaero_static_margin` is **downgraded
-to Ryan-pending** (asserts SM > 0, the same pattern the repo used the first time this gate
-went pending) until that ruling lands. The crosscheck gate's analytic reference was recomputed
-for the new wing area and still passes. Tracked in `~/.claude/state/needs-ryan-2026-09-05.md`
-item 38.
+of the old one. **Ryan ruling 2026-09-05: 6% floor until real weights** — boom length gets
+revisited once real weights exist, but 5.6% still falls short of even the reduced 6% floor, so
+`tests/test_aerodata.py::test_gate_vspaero_static_margin` stays **downgraded to Ryan-pending**
+(asserts SM > 0, the same pattern the repo used the first time this gate went pending) rather
+than closing outright. The crosscheck gate's analytic reference was recomputed for the new wing
+area and still passes. Tracked in `~/.claude/state/needs-ryan-2026-09-05.md` item 38.
 
 The tight ones are the interesting ones. Static margin now runs *below* the 8% floor under
 VSPAERO, stall computes to 23.12 kt against a hard regulatory 24, and empty weight has 17 lb of
