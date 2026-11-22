@@ -34,9 +34,9 @@ make aero-test
   about a week because the massing frame used a bow-x/keel-z datum and the mesh used its own,
   about 0.2 ft apart. Both gates passed the entire time. **Treat a gate that has never failed
   as unproven, not as safe** — this is the repo's most expensive lesson.
-- **Three gates have almost no room and drive everything downstream:** static margin sits at
-  exactly the 8% floor under VSPAERO with zero margin, computed stall is 23.73 kt against a
-  hard regulatory 24, and empty weight has ~17 lb under the Part 103 ceiling. Any parameter
+- **Three gates have almost no room and drive everything downstream:** static margin under VSPAERO
+  is 5.6%, below even the 6% interim floor (Ryan ruling 2026-09-05; the gate is downgraded to
+  Ryan-pending, see README), computed stall is 23.12 kt against a hard regulatory 24, and empty weight has ~17 lb under the Part 103 ceiling. Any parameter
   change touching wing area, weight, or tail geometry will move at least one of them.
 - **The analytic and VSPAERO static margins are cross-checked, and their disagreement is
   itself a gate.** Don't "fix" one to match the other; a widening gap is the signal.
